@@ -9,6 +9,8 @@ The simulated seagrass of the model develop under certain ambient conditions and
 The code is in Python 3, and to perform a simulation the scipy, pandas, numpy, matplotlib, tqdm modules are required additionally to some other base modules.
 To save an animation of the meadow growth ffmpeg is required.
 The repository also has the necessary files and code to run the simulations used in Salinas (2019) to validate the model.
+To run a test simulation a directory 'inputs' must exist in the same direction  as 'zostera_model.py', and must contain the datasets 'sample_ambient2000.csv', 'sample_founding_rhizomes_2000.csv' and 'cannal_200m_broad_4m_prof' must  (which can be created with 'sample_world.py').
+
 A complete description and discussion of the model is presented in:
 
 Salinas, Hugo. (2019). Simulación dinámica de una pradera de Zostera marina. Master of Science degree in Marine Ecology thesis. Center for Scientific Research and Higher Education of Ensenada (CICESE), Baja. California, Mexico.
