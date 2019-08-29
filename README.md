@@ -1,6 +1,8 @@
 # Zostera-marina-IBM
 Code for an individual based  model that simulates eelgrass (Zostera marina) growth
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3381611.svg)](https://doi.org/10.5281/zenodo.3381611)
+
 This repository has the code necessary to make a simulation of the development of an eelgrass (Zostera marina) meadow.
 The model uses instances of object classes to represent the individuals that form a seagrass  meadow. The member data of each Class represents some attribute of a real-world object, and the class function the processes that affect them. 
 The simulated seagrass of the model develop under certain ambient conditions and are located spatially in a point of a “world.”
