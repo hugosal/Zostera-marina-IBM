@@ -37,3 +37,4 @@ place = open(os.getcwd() + os.sep + 'cannal_200m_broad_4m_prof.dat', "wb")
 pickle.dump((grid_x, grid_y,depth_x_y ), place)
 place.close()
 #now you can use the canal world in a simulation
+print("Succes")
