@@ -6,6 +6,7 @@ from zostera_plotter import plot_meadow
 
 import random as rn
 import os
+import sys
 import pickle
 import pandas
 import math
@@ -308,8 +309,9 @@ class zostera:
 			del self.branches[bran]
 		self.refresh()
 
+# phytomer is a list of class phytomer instances
 class branch:
-	def __init__(self, phytomers,origin=[]):  # phytomer is a list of class phytomer instances
+	def __init__(self, phytomers,origin=[]): 
 		self.phytomers = phytomers 
 		self.angle = True  # if a new branch will come from the left or right side of the branch
 		self.active = True  # indicates if the meristem is active, and thus the branch is growing
@@ -599,10 +601,10 @@ def simulation(meadow, ambientales, var_maps, grid_x, grid_y, save, *args):
 		print(("Outputs saved as %s" % file_name))
 	return (points, ages, lengths, demogra, zos_num)
 
-def main(seed): #the main function
+def main(seed, inputs): #the main function
 	rn.seed(seed)  # set the random seed to use in the random module
 	np.random.seed(seed)  #and in the numpy module
-	#the inputs list has characters of the name of the files to use in the simulation in order: meadow, ambient, world.
+	#the inputs list has strings of the name of the files to use in the simulation in order: meadow, ambient, world.
 	#this files must be in a 'inputs' directory in the directory of this file. the initial meadow can be
 	#the meadow obatined from a previous simulation, in that case the first argument must be the name
 	#of sich file, to create a meadow using a csv file set te argument to be a string that does not match
@@ -611,26 +613,37 @@ def main(seed): #the main function
 	#for the ambient condtitions: 'ambient_2000.csv'
 	#for the csv file of the initial branches: 'initial_branches_2000.csv'
 	#for the world: 'cannal_200m_broad_4m_prof.data', this file can be created in 'sample_world.py' 
-	inputs = ["null", "sample_ambient2000.csv", "cannal_200m_broad_4m_prof.dat"]
+	#inputs[1:] = ["sample_founding_rhizomes_2000.csv", "sample_environment2000.csv", "cannal_200m_broad_4m_prof.dat"]
+
 	print ("Preparing simulation")
+	#inputs deben de ser Initial, Environment, World
 	#STEP  1: create a meadow of load one
 	#load a meadow if there is a pickable file in in the inputs directory
-	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[0]): #if there is a file that matches the meadow file
-	#name
-		for m in load_meadow(inputs[0]):
+	print(inputs[1].endswith(".csv"))
+	if inputs[1].endswith(".csv"):
+		for m in create_zosteras_from_csv(inputs[1]):  # set the name of  the csv file here
 			meadow.append(m)
-		print("Meadow loaded from file: " + inputs[0])
-	else:  #if there is not a pickable meadow file, create a meadow from a csv file
-		for m in create_zosteras_from_csv('sample_founding_rhizomes_2000.csv'):  # set the name of  the csv file here
+		print("Meadow succesfully created")
+	elif os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[1]): #if there is a file that matches the meadow file name
+		for m in load_meadow(inputs[1]):
 			meadow.append(m)
-	print("Meadow succesfully created")
+		print("Meadow loaded from file: " + inputs[1])
+	else:
+		raise NameError("Invalid Initial file")
+		
 	#STEP 2 import ambiental condition and world
-	ambiental = load_ambient(inputs[1])
-	print("Ambient conditions time series loaded from file: " + inputs[1])
+	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[2]):
+		ambiental = load_ambient(inputs[2])
+		print("Ambient conditions time series loaded from file: " + inputs[2])
+	else:
+		raise NameError("Invalid Environment file")
 
 	#load world map
-	(grid_x, grid_y, depth_x_y) = load_map(inputs[2])
-	print("World loaded from file: " + inputs[2])
+	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[3]):
+		(grid_x, grid_y, depth_x_y) = load_map(inputs[3])
+		print("World loaded from file: " + inputs[3])
+	else:
+		raise NameError("Invalid World file")
 
 	#grid_x and grid_y is the mesh grid of the coordinates of the cells of the world, dept_x_y has the depth of those
 	#same cells
@@ -643,7 +656,7 @@ def main(seed): #the main function
 	start_time = time.time()#to print the duration of the simulation 
 
 	print(("Simulating..."))
-	output = simulation(meadow, ambiental, var_maps, grid_x, grid_y, False, 'output_data_base')
+	output = simulation(meadow, ambiental[0:2], var_maps, grid_x, grid_y, True, 'output_data_base')
 
 	print("Simulaction finished. Tima elapsed : %s seconds" % round((time.time() - start_time), 1))
 	#Step 4 optionally make an animation of the simulation and or save  it
@@ -653,10 +666,9 @@ def main(seed): #the main function
 	#, or the depth, and as a list the coordinates of y grid, coordinates of x grid and the depth, save and show are
 	#booleans that indicate if an animation should be made and showed, and if it should be saved as mp4
 
-	print("The final size of meadow is %s individuals" %len(meadow))
+	print("The final population size is %s individuals" %len(meadow))
 
 	print("~(^w^)~")#succes
 
-
 if __name__ == "__main__":
-    main(seed = 100)#set the seed for the simulation
+	main(seed = 100, inputs = sys.argv)#set the seed for the simulation
