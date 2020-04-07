@@ -656,7 +656,7 @@ def main(seed, inputs): #the main function
 	start_time = time.time()#to print the duration of the simulation 
 
 	print(("Simulating..."))
-	output = simulation(meadow, ambiental[0:2], var_maps, grid_x, grid_y, True, 'output_data_base')
+	output = simulation(meadow, ambiental, var_maps, grid_x, grid_y, True, 'output_data_base')
 
 	print("Simulaction finished. Tima elapsed : %s seconds" % round((time.time() - start_time), 1))
 	#Step 4 optionally make an animation of the simulation and or save  it
