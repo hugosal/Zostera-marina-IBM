@@ -30,7 +30,7 @@ The **Initial** file may be one of two types. It can be a meadow obtained from t
 
 The test correspond to the simulation of the year 2000 in the Punta Banda Estuary in Baja California, Mexico.
 
-The test simulation of the 2000 is carried out by using as inputs 'sample_environment_2000.csv', 'sample_founding_rhizomes_2000.csv' and 'cannal_200m_broad_4m_prof' as **Environment**, **Initial** and **World**, respectively. 
+The test simulation of the 2000 is carried out by using as inputs *sample_environment_2000.csv*, *sample_founding_rhizomes_2000.csv* and *cannal_200m_broad_4m_prof* as **Environment**, **Initial** and **World**, respectively. 
 
 In the case of the World for this simulation the file can be obtained by running:
 ```
