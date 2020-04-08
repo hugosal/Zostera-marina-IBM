@@ -9,4 +9,3 @@ if [[ ! -f inputs/sample_environment_2000.csv && ! -f inputs/sample_founding_rhi
 	python sample_world.py
 fi
 echo "Success"
-exit 0
