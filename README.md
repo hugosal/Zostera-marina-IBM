@@ -11,7 +11,7 @@ Four components are needed to make a simulation with the model :
 
 * The code for the model classes (*Zostera_model.py*)
 * An initial set of Zostera class objects (**Initial**)
-* A grid representing the world in which the objects are located (**World**)
+* A set of grids representing the world in which the objects are located (**World**)
 * A time series of fortnightly environmental conditions (**Environment**)
 
 The model simulates the development of the **Initial** inidividuals, developing inside the **World** when exposed to the **Environment** in a fortnightly time step. The output of a simulation is a database with morphological measures of a sample of individuals each time step.
