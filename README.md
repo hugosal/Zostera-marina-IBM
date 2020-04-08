@@ -22,7 +22,7 @@ Download or clone the necessary files and data sets from the [repository](https:
 
 To run a simulation, the directory *inputs* must exist along *zostera_model.py* and must contain the datasets corresponding to **World**, **Environment**, and **Initial**.
 
-The **Environment** file must be a CSV file. The columns in the file must correspond in order to Sea surface temperature (C°), water temperature anomaly (C°), global horizontal irradiance (GHI; kW fortnight<sup>-1</sup> m<sup>-2</sup>), and air exposure (h fortnight<sup>-1</sup>). Optionally, it can contain a fifth row, with the datetime module timestamp of the corresponding row of environmental conditions. The timestamp is only used to plot the corresponding date in an output animation. Each row corresponds to a fortnight of environmental conditions.
+The **Environment** file must be a CSV file. The columns in the file must correspond in order to Sea surface temperature (C°), water temperature anomaly (C°), global horizontal irradiance (GHI; kW fortnight<sup>-1</sup> m<sup>-2</sup>), and air exposure at a depth of 0.5 m (h fortnight<sup>-1</sup>). Optionally, it can contain a fifth row, with the datetime module timestamp of the corresponding row of environmental conditions. The timestamp is only used to plot the corresponding date in an output animation. Each row corresponds to a fortnight of environmental conditions.
 
 The **World** corresponds to a pickable list of three numpy mgrids; the first is the grid with x coordinates, the second with the y coordinates, and the third the depth at each cell.
 
@@ -56,7 +56,8 @@ The output of a simulation will be created in a directory named output. The outp
 
 ## Notes
 The model uses pseudo-random number generators. The number seed is set in the file *Zostera_model.py*.
-The code *zostera_plotter.py* is used to make an animation of the development of the meadow. This function would be called directly by the *Zostera_model.py* but is disabled to reduce time and resource consumption. The plot obtained is a mp4 file, and the ffmpeg program is required. To enable it, change the call from the main loop to:
+The required python modules are;  **random**, **os**, **sys**, **pickle**, **csv**, **pandas**, **math**, **numpy** , **scipy**, **matplotlib**, and **tqdm**.
+The file *zostera_plotter.py* can be used to make an animation of the development of the meadow. This function is called directly by the *Zostera_model.py*, but is disabled to reduce time and resource consumption. The plot obtained is a mp4 file, and the ffmpeg program is required to create it. To make an animation change the call from the main loop to:
 ```
 plot_meadow(output, var_maps[0], [grid_x, grid_y, depth_x_y], save=True, show=True)
 ```
