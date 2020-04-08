@@ -20,7 +20,7 @@ The model simulates the development of the **Initial** inidividuals, developing 
 
 Download or clone the necessary files and data sets from the [repository](https://github.com/hugosal/Zostera-marina-IBM).
 
-To run a simulation, the directory *inputs* must exist along *zostera_model.py* and must contain the datasets corresponding to **World**, **Environment**, and **Initial**.
+To run a simulation, the directory *inputs* must exist along *zostera_model.py* and must contain the files corresponding to **World**, **Environment**, and **Initial**.
 
 The **Environment** file must be a CSV file. The columns in the file must correspond in order to Sea surface temperature (C°), water temperature anomaly (C°), global horizontal irradiance (GHI; kW fortnight<sup>-1</sup> m<sup>-2</sup>), and air exposure at a depth of 0.5 m (h fortnight<sup>-1</sup>). Optionally, it can contain a fifth row, with the datetime module timestamp of the corresponding row of environmental conditions. The timestamp is only used to plot the corresponding date in an output animation. Each row corresponds to a fortnight of environmental conditions.
 
