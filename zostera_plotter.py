@@ -139,7 +139,7 @@ def plot_meadow(output, irradiance, world_stuff, save, show):
         try:
             Writer = animation.writers['ffmpeg']
         except RuntimeError:#ffmpeg program must be installed. The path to the program can  be specified in the next line
-            plt.rcParams['animation.ffmpeg_path'] = 'C:/Users/example/ffmpeg-20181029-32d021c-win64-static/bin/ffmpeg'
+            plt.rcParams['animation.ffmpeg_path'] = 'C:/bla/bla/ffmpeg' # write the path to ffmpeg
             Writer = animation.writers['ffmpeg']
         writer = Writer(fps=fps, bitrate=1800)
         if not (os.path.exists(os.getcwd() + os.sep + 'outputs')):
