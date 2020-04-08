@@ -48,7 +48,7 @@ $ bash zostera_model_test_preparer.sh
 Run the *Zostera_model.py* code and specify the names of the **Initial**, **Environment**, and **World** files to use, in that order:
 
 ```
-$ python zostera_model.py sample_founding_rhizomes_2000.csv sample_environment2000.csv cannal_200m_broad_4m_prof.dat
+$ python zostera_model.py sample_founding_rhizomes_2000.csv sample_environment_2000.csv cannal_200m_broad_4m_prof.dat
 ```
 A progress bar should be displayed, and at the end, print a *Success* message.
 
