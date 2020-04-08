@@ -52,7 +52,7 @@ $ python zostera_model.py sample_founding_rhizomes_2000.csv sample_environment_2
 ```
 A progress bar should be displayed, and at the end, print a *Success* message.
 
-The output of a simulation will be created in a directory named output. The output is comprised of a .dat file, an optional mp4 file, and a CSV file.  The .dat file contains the meadow at the end of a simulation, and this file can be used to run a new simulation. The mp4 file is an animation of the development of the meadow. The CSV file contains the internode length of the phytomer comprising a sample of 20 randomly sampled individuals of the meadow. The data can be analyzed with the supporting .R files.
+The output of a simulation will be created in a directory named output. The output is comprised of a .dat file, an optional mp4 file, and a CSV file.  The .dat file contains the meadow at the end of a simulation, and this file can be used to run a new simulation. The mp4 file is an animation of the development of the meadow. The CSV file contains the internode length of the phytomer comprising a sample of 20 randomly sampled individuals of the meadow for each timestep. The data can be analyzed with the supporting .R files.
 
 ## Notes
 The model uses pseudo-random number generators. The number seed is set in the file *Zostera_model.py*.
