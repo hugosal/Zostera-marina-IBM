@@ -1,7 +1,5 @@
 #o-*- coding: utf-8 -*-
-#$Id: $
-
-#functions to create  a sample world for the model
+#functions to create  a sample world for the model representing punta banda estuary
 
 import os
 import math
