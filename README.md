@@ -30,11 +30,11 @@ The **Initial** file may be one of two types. It can be a meadow obtained from t
 
 The test correspond to the simulation of the year 2000 in the Punta Banda Estuary in Baja California, Mexico.
 
-The test simulation of the 2000 is carried out by using as inputs *sample_environment_2000.csv*, *sample_founding_rhizomes_2000.csv* and *cannal_200m_broad_4m_prof* as **Environment**, **Initial** and **World**, respectively. 
+The test simulation of the 2000 is carried out by using as inputs *environment_2000.csv*, *founding_rhizomes_2000.csv* and *cannal_200m_broad_4m_prof* as **Environment**, **Initial** and **World**, respectively. 
 
 In the case of the World for this simulation the file can be obtained by running:
 ```
-$ python sample_world.py
+$ python punta_banda_world.py
 ```
 This will create the file cannal_200m_broad_4m_prof and print a "Success" message.
 
@@ -48,7 +48,7 @@ $ bash zostera_model_test_preparer.sh
 Run the *Zostera_model.py* code and specify the names of the **Initial**, **Environment**, and **World** files to use, in that order:
 
 ```
-$ python zostera_model.py sample_founding_rhizomes_2000.csv sample_environment_2000.csv cannal_200m_broad_4m_prof.dat
+$ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat
 ```
 A progress bar should be displayed, and at the end, print a *Success* message.
 
