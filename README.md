@@ -7,14 +7,14 @@ Test simulations are available.
 
 ## Overview
 
-Four components are needed to make a simulation with the model :
+Four components are needed to make a simulation with the model:
 
 * The code for the model classes (*Zostera_model.py*)
 * An initial set of Zostera class objects (**Initial**)
 * A set of grids representing the world in which the objects are located (**World**)
 * A time series of fortnightly environmental conditions (**Environment**)
 
-The model simulates the development of the **Initial** inidividuals, developing inside the **World** when exposed to the **Environment** in a fortnightly time step. The output of a simulation is a database with morphological measures of a sample of individuals for each time step.
+The model simulates the development of the **Initial** individuals developing inside the **World** when exposed to the **Environment** in a fortnightly time step. The output of a simulation is a database with morphological measures of a sample of individuals for each time step.
 
 ## Prerequisites
 
@@ -45,14 +45,21 @@ $ bash zostera_model_test_preparer.sh
 
 ## Running a simulation
 
-Run the *Zostera_model.py* code and specify the names of the **Initial**, **Environment**, and **World** files to use, in that order:
+Run the *Zostera_model.py* code and specify as the names of the **Initial**, **Environment**, and **World** files to use, in that order.
 
 ```
 $ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat
 ```
+Optionally, an integer number can be specified as the fourth argument to be used as the random number seed; the default number is 26.
+```
+$ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat 42
+```
 A progress bar should be displayed, and at the end, print a *Success* message.
-
-The output of a simulation will be created in a directory named output. The output is comprised of a .dat file, an optional mp4 file, and a CSV file.  The .dat file contains the meadow at the end of a simulation, and this file can be used to run a new simulation. The mp4 file is an animation of the development of the meadow. The CSV file contains the internode length of the phytomer comprising a sample of 20 randomly sampled individuals of the meadow for each timestep. The data can be analyzed with the supporting .R files.
+The output is comprised of a .dat file, a CSV file, and an optional mp4 file.
+The .dat file contains the individuals at the end of a simulation, and this file can be used to run a new simulation as an initial meadow. 
+The CSV file contains the internode length of the phytomer comprising a sample of 20 randomly sampled individuals of the meadow for each time-step.
+The output files will be named combining the input file names and the random number seed and will be created in a directory named output
+The mp4 file is an animation of the development of the meadow.
 
 ## Notes
 The model uses pseudo-random number generators. The number seed is set in the file *Zostera_model.py*.

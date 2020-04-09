@@ -601,7 +601,7 @@ def simulation(meadow, ambientales, var_maps, grid_x, grid_y, save, *args):
 		print(("Outputs saved as %s" % file_name))
 	return (points, ages, lengths, demogra, zos_num)
 
-def main(seed, inputs): #the main function
+def main(inputs, seed = 26): #the main function
 	rn.seed(seed)  # set the random seed to use in the random module
 	np.random.seed(seed)  #and in the numpy module
 	#the inputs list has strings of the name of the files to use in the simulation in order: meadow, ambient, world.
@@ -619,29 +619,29 @@ def main(seed, inputs): #the main function
 	#inputs deben de ser Initial, Environment, World
 	#STEP  1: create a meadow of load one
 	#load a meadow if there is a pickable file in in the inputs directory
-	print(inputs[1].endswith(".csv"))
-	if inputs[1].endswith(".csv"):
-		for m in create_zosteras_from_csv(inputs[1]):  # set the name of  the csv file here
+	print(inputs[0].endswith(".csv"))
+	if inputs[0].endswith(".csv"):
+		for m in create_zosteras_from_csv(inputs[0]):  # set the name of  the csv file here
 			meadow.append(m)
 		print("Meadow succesfully created")
-	elif os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[1]): #if there is a file that matches the meadow file name
-		for m in load_meadow(inputs[1]):
+	elif os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[0]): #if there is a file that matches the meadow file name
+		for m in load_meadow(inputs[0]):
 			meadow.append(m)
-		print("Meadow loaded from file: " + inputs[1])
+		print("Meadow loaded from file: " + inputs[0])
 	else:
 		raise NameError("Invalid Initial file")
 		
 	#STEP 2 import ambiental condition and world
-	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[2]):
-		ambiental = load_ambient(inputs[2])
-		print("Ambient conditions time series loaded from file: " + inputs[2])
+	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[1]):
+		ambiental = load_ambient(inputs[1])
+		print("Ambient conditions time series loaded from file: " + inputs[1])
 	else:
 		raise NameError("Invalid Environment file")
 
 	#load world map
-	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[3]):
-		(grid_x, grid_y, depth_x_y) = load_map(inputs[3])
-		print("World loaded from file: " + inputs[3])
+	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[2]):
+		(grid_x, grid_y, depth_x_y) = load_map(inputs[2])
+		print("World loaded from file: " + inputs[2])
 	else:
 		raise NameError("Invalid World file")
 
@@ -657,7 +657,7 @@ def main(seed, inputs): #the main function
 
 	print(("Simulating..."))
 
-	output_name = '_'.join([file.split('.')[0] for file in inputs[1:]]) # the name of the output is the combination of the input files
+	output_name = '_'.join([file.split('.')[0] for file in inputs]) + "_" + str(seed)# the name of the output is the combination of the input files
 
 	output = simulation(meadow, ambiental, var_maps, grid_x, grid_y, True, output_name)
 
@@ -674,4 +674,7 @@ def main(seed, inputs): #the main function
 	print("~(^w^)~")#succes
 
 if __name__ == "__main__":
-	main(seed = 100, inputs = sys.argv)#set the seed for the simulation
+	if len(sys.argv) == 5:#if the four arugments (plus file name) are specifies
+		main(inputs = sys.argv[1:4], seed = int(sys.argv[4]))
+	else:
+		main(inputs = sys.argv[1:4])#else use the default seed

@@ -145,5 +145,5 @@ def plot_meadow(output, irradiance, world_stuff, save, show):
         if not (os.path.exists(os.getcwd() + os.sep + 'outputs')):
             os.mkdir('outputs')
 
-        ani.save(os.getcwd() + os.sep + 'outputs' + os.sep + 'animacion_meadow.mp4', writer=writer)
+        ani.save(os.getcwd() + os.sep + 'outputs' + os.sep + 'animation_meadow.mp4', writer=writer)
 
