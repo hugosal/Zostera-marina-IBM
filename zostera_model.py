@@ -50,10 +50,10 @@ class zostera:
 				return new_phytomers
 
 			def length_of_new_phytomers():
-				desv = 6.39535763 +(-0.79970230*(anomaly**2))  # the standard  deviation of the distribution
+				desv = 6.24029427 +(-0.79728514*(anomaly**2))  # the standard  deviation of the distribution
 				
-				mean_y = (0.29217179 * temperature) + (-0.01038736*(temperature**2)) + (-0.67627327 * (anomaly**2)
-					) + (0.20300747 * irradiance) + (-0.17671855 * hours_exposition) #the mean of the distribution
+				mean_y = (0.47810683 * temperature) + (-0.01180688*(temperature**2)) + (-0.74016238 * (anomaly**2)
+					) + (0.15130575 * irradiance) + (-0.13024514 * hours_exposition) #the mean of the distribution
 
 				#using the mean and sd of the distribution calculate the gamma distribution parameters
 				length_of_new_phyt = gamma.rvs(a=(mean_y**2)/(desv**2), scale=(1/((mean_y)/(desv**2))), size=1)[0]
