@@ -107,6 +107,13 @@ class zostera:
 	#pointers (pointers that point to instances that are no longer part of an individual) this function deletes
 	#these the plants or parts of plants
 		for bran in self.branches: #remove pointer pointing at nothing
+			for phy in bran.phytomers: 
+				if phy.branch_pointer:  # if there is a lateral branch
+					if phy.branch_pointer  not in self.branches: #if the pointer points at something not in the indidual
+						branch_index = self.branches.index(bran)
+						phyt_index = self.branches[branch_index].phytomers.index(phy)
+						self.branches[branch_index].phytomers[phyt_index].delete_branch_out_here() # remove 
+
 			if len(bran.phytomers) < 1:
 				if (bran.origin[0] in self.branches) and (bran.origin [1] in bran.origin[0].phytomers):
 				#if a branch is too small is deleted, and the pointers are also deleted
@@ -114,14 +121,7 @@ class zostera:
 					index_phtyo_pointer = self.branches[index_branch_pointer].phytomers.index(bran.origin[1])
 					self.branches[index_branch_pointer].phytomers[index_phtyo_pointer].delete_branch_out_here()
 				self.branch_delete(self.branches.index(b))
-				break #breaking because deleting a branch messes the loop over branches
-
-			for phy in bran.phytomers: 
-				if not not phy.branch_pointer:  # if there is a lateral branch
-					if phy.branch_pointer  not in self.branches: #if the pointer points at something not in the indidual
-						branch_index = self.branches.index(bran)
-						phyt_index = self.branches[branch_index].phytomers.index(phy)
-						self.branches[branch_index].phytomers[phyt_index].delete_branch_out_here() # remove 
+		
 
 		 #if the individual  has no branches, or if the individual  is formed of a single branch with less phytomers than the minimum
 		if (len(self.branches) < 1) or  ((len(self.branches) == 1) and (len(self.branches[0].phytomers) < 5)) :
@@ -247,14 +247,16 @@ class zostera:
 					del self.branches[bran_index].phytomers[phyt_index] #simple delete
 				elif bran.terminal() is False:
 					# case  1.2: first phytomer in branch (index 0) which is not a branching point and is not in the terminal branch
-					if len(bran.phytomers) > 6:#if branch has minimum size ´+1
+					if len(bran.phytomers) > 6:#if branch has minimum size +1
 						new = self.separate(bran, bran.phytomers[bran.phytomers.index(phy) + 1])# separates the rest of the branch
 						#and creates a new individual 
 						meadow.append(new)#add new individual to meadow list
-						#eliminate the pointer pointing to the branch that got separated
-						index_branch_pointer = self.branches.index(self.branches[bran_index].origin[0])
-						index_phtyo_pointer = self.branches[index_branch_pointer].phytomers.index(self.branches[bran_index].origin[1])
-						self.branches[index_branch_pointer].phytomers[index_phtyo_pointer].delete_branch_out_here()
+						try:
+							index_branch_pointer = self.branches.index(self.branches[bran_index].origin[0])
+							index_phtyo_pointer = self.branches[index_branch_pointer].phytomers.index(self.branches[bran_index].origin[1])
+							self.branches[index_branch_pointer].phytomers[index_phtyo_pointer].delete_branch_out_here()
+						except ValueError:#the bran fromwhich this phytomer is pointing may have been deleted before, added exception
+							pass
 					del self.branches[bran_index]
 					
 			elif bran.phytomers.index(phy) != 0:  # if  phytomer is no the first  in branch
@@ -306,7 +308,14 @@ class zostera:
 			# the separate function automatically deletes the parts that are no longer part of the individual
 			meadow.append(new)
 		else: #if the branch does not have the minumum size it is deleted
-			del self.branches[bran]
+			#before it is  deleted, check if any of its phytomers is a branching point, if it is, delete it as well
+			if(any([phy.branch_pointer for phy in self.branches[bran].phytomers])):#if it has a phytomer which is a branching point
+				to_delete = self.branches_here_on(self.branches[bran],self.branches[bran].phytomers[0],True)
+				to_delete.append(bran)
+				for bye in (to_delete.sorted(reverse=True)):
+					del self.branches[bye]
+			else:
+				del self.branches[bran]
 		self.refresh()
 
 # phytomer is a list of class phytomer instances
@@ -350,8 +359,6 @@ class branch:
 # phytomer class:
 class phytomer:  # the phyomer class represents a phytomer
 	def __init__(self, age, length, firstcoord, orient):
-		if length < 0:
-			print("CAUTION")
 		self.age = int(age)  # the age of the phytomer in plastochrons
 		self.orient = orient  # the direction in radians toward the phytomer is pointing
 		#the following constructor is designed to build phytomers as a succession of partsin a branch, so the coordinates of the 
@@ -579,10 +586,16 @@ def simulation(meadow, ambientales, var_maps, grid_x, grid_y, save, *args):
 			zos.develop(conditions_t, grid_x, grid_y)  # each individual develops according to the ambient conditions
 		#sample and record the state of the sampled individuals at the end of the time, this represents the end of the 
 		#sampling interval
-		data_saver(meadow, t ,datetime.fromtimestamp(ambientales[t][4]).strftime("%d/%m/%Y"))  # to save data for plots
+		try:
+			data_saver(meadow, t, datetime.fromtimestamp(ambientales[t][4]).strftime("%d/%m/%Y"))#  save data for plots
+			if save is True:  # to save data for the csv data file 
+				data_ecolmat.add_row(meadow, datetime.fromtimestamp(ambientales[t][4]).strftime("%d/%m/%Y"))
+		except IndexError:
+			data_saver(meadow, t, str(t))
+			if save is True: 
+				data_ecolmat.add_row(meadow, str(t))
 
-		if save is True:  # to save data for the csv data file 
-			data_ecolmat.add_row(meadow, datetime.fromtimestamp(ambientales[t][4]).strftime("%d/%m/%Y"))
+		
 
 	if save is True: #at the end of the simulation the csv file is saved (if requested)
 		#and the outputs are also saved using the pickle module
@@ -619,7 +632,6 @@ def main(inputs, seed = 26): #the main function
 	#inputs deben de ser Initial, Environment, World
 	#STEP  1: create a meadow of load one
 	#load a meadow if there is a pickable file in in the inputs directory
-	print(inputs[0].endswith(".csv"))
 	if inputs[0].endswith(".csv"):
 		for m in create_zosteras_from_csv(inputs[0]):  # set the name of  the csv file here
 			meadow.append(m)
