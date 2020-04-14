@@ -38,11 +38,6 @@ $ python punta_banda_world.py
 ```
 This will create the file cannal_200m_broad_4m_prof and print a "Success" message.
 
-A script is available to prepare the files for the test simulation.
-```
-$ bash zostera_model_test_preparer.sh
-```
-
 ## Running a simulation
 
 Run the *Zostera_model.py* code and specify as the names of the **Initial**, **Environment**, and **World** files to use, in that order.
