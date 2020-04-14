@@ -247,7 +247,7 @@ class zostera:
 					del self.branches[bran_index].phytomers[phyt_index] #simple delete
 				elif bran.terminal() is False:
 					# case  1.2: first phytomer in branch (index 0) which is not a branching point and is not in the terminal branch
-					if len(bran.phytomers) > 6:#if branch has minimum size +1
+					if len(bran.phytomers) > 5:#if branch has less 
 						new = self.separate(bran, bran.phytomers[bran.phytomers.index(phy) + 1])# separates the rest of the branch
 						#and creates a new individual 
 						meadow.append(new)#add new individual to meadow list
