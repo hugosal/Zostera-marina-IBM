@@ -673,7 +673,7 @@ def main(inputs, make_plot, seed = 26): #the main function
 
 	output = simulation(meadow, ambiental, var_maps, grid_x, grid_y, True, output_name)
 
-	print("Simulaction finished. Tima elapsed : %s seconds" % round((time.time() - start_time), 1))
+	print("Simulaction finished. Time elapsed : %s seconds" % round((time.time() - start_time), 1))
 	#Step 4 optionally make an animation of the simulation and or save  it
 
 	plot_meadow(output, var_maps[0], [grid_x, grid_y, depth_x_y], save=make_plot, show=False)# the plotting function
