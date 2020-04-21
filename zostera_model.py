@@ -444,7 +444,7 @@ class ecolmat_data_base():
 	#  ...
 	# to load the  file to make a simulation  
 def load_ambient(file_name):  # read the file and organize it as a np array
-    route = open(os.getcwd() + os.sep + 'inputs' + os.sep + file_name, "rt")
+    route = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rt")
     data_csv = csv.reader(route, delimiter=",")
     data = [a for a in data_csv]
     data_np = np.array(data, dtype=float)
@@ -452,7 +452,7 @@ def load_ambient(file_name):  # read the file and organize it as a np array
     return data_np
 
 def load_meadow(file_name): #load the meadow of the output of a previous simulation named file_name
-	place = open(os.getcwd() + os.sep + 'inputs' + os.sep + file_name, "rb")
+	place = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rb")
 	output = pickle.load(place)
 	place.close()
 	meadow = output
@@ -461,9 +461,9 @@ def load_meadow(file_name): #load the meadow of the output of a previous simulat
 
 	#fuction to load a world map comprised of and grid of x coordinates, a grid of y coordinates and a 
 	#bathymetry of the world. the world components are saved in a pickable file named file_name in the
-	#inputs directory 
+	#data directory 
 def load_map(file_name):
-    place = open(os.getcwd() + os.sep + 'inputs' + os.sep + file_name, "rb")
+    place = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rb")
     output = pickle.load(place)
     place.close()
     (grid_x, grid_y,depth_x_y) = output
@@ -510,7 +510,7 @@ def create_zosteras_from_csv(file_name): # this function creates a meadow from t
 	#in the csv file there is information to create a number induvials formed by only one terminal branch.
 	#the csv has information in columns  which contain in order: first coordinate of oldest pytomer of a branch,  y coordinate,
 	#orientation of the branch in radians, the internode length  of each internode in the branch
-	place = os.getcwd() + os.sep + 'inputs' + os.sep + file_name
+	place = os.getcwd() + os.sep + 'data' + os.sep + file_name
 	internode_lengths = (pandas.read_csv(place, header=None).values)
 	created_zosteras =[]
 	# in a loop create individuals
@@ -614,11 +614,11 @@ def simulation(meadow, ambientales, var_maps, grid_x, grid_y, save, *args):
 		print(("Outputs saved as %s" % file_name))
 	return (points, ages, lengths, demogra, zos_num)
 
-def main(inputs, seed = 26): #the main function
+def main(inputs, make_plot, seed = 26): #the main function
 	rn.seed(seed)  # set the random seed to use in the random module
 	np.random.seed(seed)  #and in the numpy module
 	#the inputs list has strings of the name of the files to use in the simulation in order: meadow, ambient, world.
-	#this files must be in a 'inputs' directory in the directory of this file. the initial meadow can be
+	#this files must be in a 'data' directory in the directory of this file. the initial meadow can be
 	#the meadow obatined from a previous simulation, in that case the first argument must be the name
 	#of sich file, to create a meadow using a csv file set te argument to be a string that does not match
 	#any file in the inptus directory.
@@ -629,14 +629,14 @@ def main(inputs, seed = 26): #the main function
 	#inputs[1:] = ["sample_founding_rhizomes_2000.csv", "sample_environment2000.csv", "cannal_200m_broad_4m_prof.dat"]
 
 	print ("Preparing simulation")
-	#inputs deben de ser Initial, Environment, World
+	#inputs are Initial, Environment, World
 	#STEP  1: create a meadow of load one
-	#load a meadow if there is a pickable file in in the inputs directory
+	#load a meadow if there is a pickable file in in the data directory
 	if inputs[0].endswith(".csv"):
 		for m in create_zosteras_from_csv(inputs[0]):  # set the name of  the csv file here
 			meadow.append(m)
 		print("Meadow succesfully created")
-	elif os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[0]): #if there is a file that matches the meadow file name
+	elif os.path.isfile(os.getcwd() +  os.sep + 'data' + os.sep + inputs[0]): #if there is a file that matches the meadow file name
 		for m in load_meadow(inputs[0]):
 			meadow.append(m)
 		print("Meadow loaded from file: " + inputs[0])
@@ -644,14 +644,14 @@ def main(inputs, seed = 26): #the main function
 		raise NameError("Invalid Initial file")
 		
 	#STEP 2 import ambiental condition and world
-	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[1]):
+	if os.path.isfile(os.getcwd() +  os.sep + 'data' + os.sep + inputs[1]):
 		ambiental = load_ambient(inputs[1])
 		print("Ambient conditions time series loaded from file: " + inputs[1])
 	else:
 		raise NameError("Invalid Environment file")
 
 	#load world map
-	if os.path.isfile(os.getcwd() +  os.sep + 'inputs' + os.sep + inputs[2]):
+	if os.path.isfile(os.getcwd() +  os.sep + 'data' + os.sep + inputs[2]):
 		(grid_x, grid_y, depth_x_y) = load_map(inputs[2])
 		print("World loaded from file: " + inputs[2])
 	else:
@@ -676,7 +676,7 @@ def main(inputs, seed = 26): #the main function
 	print("Simulaction finished. Tima elapsed : %s seconds" % round((time.time() - start_time), 1))
 	#Step 4 optionally make an animation of the simulation and or save  it
 
-	plot_meadow(output, var_maps[0], [grid_x, grid_y, depth_x_y], save=False, show=False)# the plotting function
+	plot_meadow(output, var_maps[0], [grid_x, grid_y, depth_x_y], save=make_plot, show=False)# the plotting function
 	#the arguments of the plot meadow function are the output of a simulation, a map of the variable to plot over
 	#, or the depth, and as a list the coordinates of y grid, coordinates of x grid and the depth, save and show are
 	#booleans that indicate if an animation should be made and showed, and if it should be saved as mp4
@@ -686,7 +686,9 @@ def main(inputs, seed = 26): #the main function
 	print("~(^w^)~")#succes
 
 if __name__ == "__main__":
-	if len(sys.argv) == 5:#if the four arugments (plus file name) are specifies
-		main(inputs = sys.argv[1:4], seed = int(sys.argv[4]))
+	if len(sys.argv) == 6:#if the four arugments (plus file name) are specified
+		make_plot = sys.argv[4].lower() == 'true'
+
+		main(inputs = sys.argv[1:4], make_plot = make_plot, seed = int(sys.argv[5]))
 	else:
-		main(inputs = sys.argv[1:4])#else use the default seed
+		main(inputs = sys.argv[1:4], make_plot = make_plot)#else use the default seed

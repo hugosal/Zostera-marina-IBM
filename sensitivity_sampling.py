@@ -425,7 +425,7 @@ class phytomer:  # the phyomer class represents a phytomer
 		self.branch_pointer = []
 
 def load_map(file_name):
-    place = open(os.getcwd() + os.sep + 'inputs' + os.sep + file_name, "rb")
+    place = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rb")
     output = pickle.load(place)
     place.close()
     (grid_x, grid_y,depth_x_y) = output
@@ -470,7 +470,7 @@ def variables_map(world, irrad, hours_e):
     return var_maps
 
 def load_ambient(file_name):  # read the file and organize it as a np array
-    route = open(os.getcwd() + os.sep + 'inputs' + os.sep + file_name, "rt")
+    route = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rt")
     data_csv = csv.reader(route, delimiter=",")
     data = [a for a in data_csv]
     data_np = np.array(data, dtype=float)
@@ -479,7 +479,7 @@ def load_ambient(file_name):  # read the file and organize it as a np array
 
 
 def load_meadow(file_name): #carga las zosteras de un output de una simulacion anterior
-	place = open(os.getcwd() + os.sep + 'inputs' + os.sep + file_name, "rb")
+	place = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rb")
 	output = pickle.load(place)
 	place.close()
 	meadow = output
@@ -489,7 +489,7 @@ def create_zosteras_from_csv(file_name): # crea zosteras con internododos detama
 	#el csv debe tener los datos de un rizoma por fila, las columnas son las primeras 2 las coordenadas, la 
 	#tercera la orientacion, y de la 4al final las longitudes de los internodos
 	#cargarel archivo
-	place = os.getcwd() + os.sep + 'inputs' + os.sep + file_name
+	place = os.getcwd() + os.sep + 'data' + os.sep + file_name
 	internode_lengths = (pandas.read_csv(place, header=None).values)
 	created_zosteras =[]
 	#phytomer con  rhizome, branch, prev_fit, age, length, firstcoord, orient):

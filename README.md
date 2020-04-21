@@ -20,7 +20,7 @@ The model simulates the development of the **Initial** individuals developing in
 
 Download or clone the necessary files and data sets from the [repository](https://github.com/hugosal/Zostera-marina-IBM).
 
-To run a simulation, the directory *inputs* must exist along *zostera_model.py* and must contain the files corresponding to **World**, **Environment**, and **Initial**.
+To run a simulation, the directory *data* must exist along *zostera_model.py* and must contain the files corresponding to **World**, **Environment**, and **Initial**.
 
 The **Environment** file must be a CSV file. The columns in the file must correspond in order to Sea surface temperature (C°), water temperature anomaly (C°), global horizontal irradiance (GHI; kW fortnight<sup>-1</sup> m<sup>-2</sup>), and air exposure at a depth of 0.5 m (h fortnight<sup>-1</sup>). Optionally, it can contain a fifth row, with the datetime module timestamp of the corresponding row of environmental conditions. The timestamp is only used to plot the corresponding date in an output animation. Each row corresponds to a fortnight of environmental conditions.
 
@@ -40,14 +40,17 @@ This will create the file cannal_200m_broad_4m_prof and print a "Success" messag
 
 ## Running a simulation
 
-Run the *Zostera_model.py* code and specify as the names of the **Initial**, **Environment**, and **World** files to use, in that order.
+Run the *Zostera_model.py* code and specify as the names of the **Initial**, **Environment**, and **World** files to use, in that order. 
+
+A fourth argument Boolean variable specifies if an animation is to be made, depending on the number of individuals this option is highly resource consuming, it is not recommended to use in such cases.
+
 
 ```
-$ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat
+$ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat false
 ```
 Optionally, an integer number can be specified as the fourth argument to be used as the random number seed; the default number is 26.
 ```
-$ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat 42
+$ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat false 42
 ```
 A progress bar should be displayed, and at the end, print a *Success* message.
 The output is comprised of a .dat file, a CSV file, and an optional mp4 file.
