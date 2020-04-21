@@ -686,9 +686,8 @@ def main(inputs, make_plot, seed = 26): #the main function
 	print("~(^w^)~")#succes
 
 if __name__ == "__main__":
+	make_plot_arg = sys.argv[4].lower() == 'true'
 	if len(sys.argv) == 6:#if the four arugments (plus file name) are specified
-		make_plot = sys.argv[4].lower() == 'true'
-
-		main(inputs = sys.argv[1:4], make_plot = make_plot, seed = int(sys.argv[5]))
+		main(inputs = sys.argv[1:4], make_plot = make_plot_arg, seed = int(sys.argv[5]))
 	else:
-		main(inputs = sys.argv[1:4], make_plot = make_plot)#else use the default seed
+		main(inputs = sys.argv[1:4], make_plot = make_plot_arg)#else use the default seed
