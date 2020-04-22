@@ -60,7 +60,7 @@ The output files will be named combining the input file names and the random num
 
 ## Notes
 The required python modules are;  **random**, **os**, **sys**, **pickle**, **csv**, **pandas**, **math**, **numpy** , **scipy**, **matplotlib**, and **tqdm**.
-The file *zostera_plotter.py* can be used to make an animation of the development of the meadow. This function is called directly by the *Zostera_model.py*. The animation obtained is an mp4 file, and the ffmpeg program is required to create it. Depending on the number of individuals the rendering of the animation may be slow.
+The file *zostera_plotter.py* can be used to make an animation of the development of the meadow. This function is called directly by *Zostera_model.py*. The ffmpeg program is required to an animation. Depending on the number of individuals the rendering of the animation may be slow.
 ## Authors
 
 **Hugo Salinas** - [hugosal](https://github.com/hugosal)
