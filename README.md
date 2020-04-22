@@ -67,7 +67,7 @@ The file *zostera_plotter.py* can be used to make an animation of the developmen
 
 ## License
 
-This project is licensed under the GNU General Public License v3.0 - see the [https://github.com/hugosal/Zostera-marina-IBM/blob/master/LICENSE](LICENSE.md) file for details
+This project is licensed under the GNU General Public License v3.0 
 
 ## Acknowledgments
 
