@@ -3,7 +3,7 @@
 Code for an individual-based model that simulates eelgrass (*Zostera marina*) growth.
 The model represents individuals as objects, which develop inside of a spatially explicit world while being exposed to environmental conditions.
 Test simulations are available.
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3381611.svg)](https://doi.org/10.5281/zenodo.3381611)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.3752153.svg)](https://doi.org/10.5281/zenodo.3752153)
 
 ## Overview
 
