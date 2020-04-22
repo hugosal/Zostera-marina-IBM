@@ -42,8 +42,7 @@ This will create the file cannal_200m_broad_4m_prof and print a "Success" messag
 ## Running a simulation
 Run the *Zostera_model.py* code and specify as the names of the **Initial**, **Environment**, and **World** files to use, in that order. 
 
-A fourth argument Boolean variable (true/false) specifies if an animation is to be made, depending on the number of individuals this option may be highly resource consuming
-
+A fourth argument Boolean variable (true/false) specifies if an animation is to be made.
 
 ```
 $ python zostera_model.py founding_rhizomes_2000.csv environment_2000.csv cannal_200m_broad_4m_prof.dat false
@@ -61,8 +60,7 @@ The output files will be named combining the input file names and the random num
 
 ## Notes
 The required python modules are;  **random**, **os**, **sys**, **pickle**, **csv**, **pandas**, **math**, **numpy** , **scipy**, **matplotlib**, and **tqdm**.
-The file *zostera_plotter.py* can be used to make an animation of the development of the meadow. This function is called directly by the *Zostera_model.py*. The animation obtained is an mp4 file, and the ffmpeg program is required to create it. 
-
+The file *zostera_plotter.py* can be used to make an animation of the development of the meadow. This function is called directly by the *Zostera_model.py*. The animation obtained is an mp4 file, and the ffmpeg program is required to create it. Depending on the number of individuals the rendering of the animation may be slow.
 ## Authors
 
 **Hugo Salinas** - [hugosal](https://github.com/hugosal)
