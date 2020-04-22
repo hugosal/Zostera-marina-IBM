@@ -28,11 +28,12 @@ The **World** corresponds to a pickable list of three numpy mgrids; the first is
 
 The **Initial** file may be one of two types. It can be a meadow obtained from the output of a previous simulation. Or it can be a CSV file that will be used to create the corresponding objects. This CSV file must contain n rows, corresponding to n new rhizomes to create. The first to the third column of the file contains the longitude coordinate of the first phytomer of the individual, the latitude, and the orientation of the rhizome (rad), respectively. The subsequent columns contain each of the internode lengths of the phytomers in the rhizome.
 
-The test corresponds to the simulation of the year 2000 in the Punta Banda Estuary in Baja California, Mexico.
+The datasets to perform a test simulation are available.
+The simulation corresponds to the simulation of the year 2000 in the Punta Banda Estuary in Baja California, Mexico.
 
-The test simulation of the 2000 is carried out by using as inputs *environment_2000.csv*, *founding_rhizomes_2000.csv* and *cannal_200m_broad_4m_prof* as **Environment**, **Initial** and **World**, respectively. 
+The test simulation of the 2000 is carried out by using as inputs *environment_2000.csv*, *founding_rhizomes_2000.csv* and *cannal_200m_broad_4m_prof* as **Environment**, **Initial** and **World**, respectively.
 
-In the case of the **World** for this simulation, the file can be obtained by running:
+The **World** of the test can be obtained by running:
 ```
 $ python punta_banda_world.py
 ```
