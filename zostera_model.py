@@ -595,8 +595,6 @@ def simulation(meadow, ambientales, var_maps, grid_x, grid_y, save, *args):
 			if save is True: 
 				data_ecolmat.add_row(meadow, str(t))
 
-		
-
 	if save is True: #at the end of the simulation the csv file is saved (if requested)
 		#and the outputs are also saved using the pickle module
 		if not (os.path.exists(os.getcwd() + os.sep + 'outputs')):
