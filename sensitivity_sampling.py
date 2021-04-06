@@ -35,13 +35,13 @@ def simulacion_con_fila(fila_de_parametros):
 
 	var_maps = variables_map(depth_x_y, ambiental[:, 2],ambiental[:, 3])
 
-	output = simulation(meadow, ambiental[0:9], var_maps, grid_x, grid_y, fila_de_parametros)
+	output = simulation(meadow, ambiental[0:14], var_maps, grid_x, grid_y, fila_de_parametros)
 	
 	return output
 
 class zostera:
-	def __init__(self, branches):  # branches es un lista de ramas
-		self.branches = branches  # lista objetos rama
+	def __init__(self, branches): 
+		self.branches = branches  
 
 	def calculate_rates(self, ambientales, loc_irrad, loc_hours_exp, terminal, fila_de_parametros):    # para calcular las tasas de crecimiento
 		# ambiente es un vector con la temp, anomalia, etc. 
@@ -51,14 +51,8 @@ class zostera:
 		anomaly = ambientales[1]
 		irradiance = loc_irrad
 		hours_exposition = loc_hours_exp
-		#print("global ")
-		#print(ambientales[3])
-		#print("local")
-		#print(hours_exposition)
 
-
-		if loc_hours_exp > 60: # el dato mas grande de horas es de 60, y eso significa que no se vale extrapolar a mas
-			#alla de ese valor, ademas, si estan tantotiempo expusto no deberian recer, asi quepongo estoasi
+		if loc_hours_exp > 60: 
 			print("estoy en tierra")
 			def number_of_new_phytomers():
 				return 0 
@@ -66,12 +60,8 @@ class zostera:
 			def length_of_new_phytomers():
 				return 0
 		else:
-			#los parametros anteriores se calcularon bayesianamente en  regresion_crec_long.r, para la simulacion 
-			#se va a generar un numero aleatorio de una distribucion cuya forma esta dad por parametros que siguen
-			#la distribucion gamma aquise parametriza con a=loc y shape= rate=1/beta
 			def number_of_new_phytomers():
-				#generador poisson poisson.rvs(1, size=10)
-				mean_y = theta1 # lambda constante 
+				mean_y = theta1 
 				new_phytomers = poisson.rvs(mean_y)
 				return new_phytomers
 
@@ -82,13 +72,9 @@ class zostera:
 				#la media de longitud es:
 				mean_y = (theta4 * temperature) + (theta5*(temperature**2)) + (theta6 * (anomaly**2)
 					) + (theta7 * irradiance) + (theta8 * hours_exposition)
-				#length_of_new_phyt =  max(0, norm.rvs(loc=mean_y,scale=desv, size=1)[0])
 				length_of_new_phyt = gamma.rvs(a=(mean_y**2)/(desv**2), scale=(1/((mean_y)/(desv**2))), size=1)[0]
 				if not terminal:
-					#el siguiente es para reducir el tamanio de los internodos de las ramas laterales, el valor
-					#se calculo con una muestra pequenia, los numeros viene de longitud_rizoma_vs__lateral.R
 					length_of_new_phyt = length_of_new_phyt * norm.rvs(loc=theta9,scale= theta10)
-				#print(length_of_new_phyt)
 				return length_of_new_phyt
 
 		return (number_of_new_phytomers, length_of_new_phytomers)
@@ -96,60 +82,43 @@ class zostera:
 	def develop(self, conditions_t, grid_x, grid_y, fila_de_parametros):
 		(theta1, theta2, theta3, theta4, theta5, theta6, theta7, theta8, theta9, theta10,
 		theta11, theta12, theta13, theta14, theta15, theta16) = fila_de_parametros
-		#el nuevo schedulling de develop es el siguiente:
-		#dentro de un ciclo for para una rama 1. quitar ramas hereon  recursiva con prob fija que 
-		#viene de regresion_crec_rama_bayes_ver_2.R, despues agregar con un for los fitomeros que prediga la funcion
-		#number_of_new_phytomer, pero cada vez que se agregue uno, antes de que salga puedesalir una ramacon prob fija,
-		#ya que se agrega un fitomero auna rama se envejece la rama y con prob en funcion de edad se muere ultimo fitomero
-		#de la rama
+
 		if len(self.branches)>1:
-			lateral_branches = self.branches_here_on(self.branches[0], self.branches[0].phytomers[0], True)#.sort()#lista de los indices de lasr ramas
+			lateral_branches = self.branches_here_on(self.branches[0], self.branches[0].phytomers[0], True)
 			lateral_branches = [item for sublist in lateral_branches for item in sublist]
-			lateral_branches = sorted(set(lateral_branches),reverse=True) #set paraque no se repitan
-			for posible_delete_bran in lateral_branches: #las ramas pueden morir
-				#pmuere = min(max(0,norm.rvs(loc=0.2460341, scale=0.09731517,size=1)),1)#esta es laultima.. peronoda buen resultado
-				#la distribucion beta se puede parametrizar conmedia y desv de la distribucion como
-				#alpha = ((1 - mu) / var - 1 / mu) * mu ^ 2
-  				#beta = alpha * (1 / mu - 1)
-				#pmuere = 0.2040021#0.4308347
+			lateral_branches = sorted(set(lateral_branches),reverse=True)
+			for posible_delete_bran in lateral_branches: 
 				pmuere =  beta.rvs(a=theta11, b=theta12,size=1)[0]
-				if bernoulli.rvs(pmuere, size=1)[0] == 1: #esta prob es fija, si la rama debe morir la borro
+				if bernoulli.rvs(pmuere, size=1)[0] == 1:
 					index_branch_pointer = self.branches.index(self.branches[posible_delete_bran].origin[0])
 					index_phtyo_pointer = self.branches[index_branch_pointer].phytomers.index(self.branches[posible_delete_bran].origin[1])
 					self.branches[index_branch_pointer].phytomers[index_phtyo_pointer].delete_branch_out_here()
-					self.branch_delete(posible_delete_bran)# las separa, branch_deleteo toma como argumento indice de rama
-					# se elimina el pointer de  la rama, esdecir, se quitar el pointer del fitomero de donde salia la rama
-				
+					self.branch_delete(posible_delete_bran)				
 
-		for bran in reversed(self.branches):  # ahora para crecer y ramificar
-			if bran.active:  # si el meristemo de la rama esta activo:si esta creciendo 
-				#calcular irradiancia y hex local en el punto del fitomero que crece 
+		for bran in reversed(self.branches):
+			if bran.active: 
 				loc_irrad = local_var_from_map(conditions_t[0], grid_x, grid_y,  bran.phytomers[-1])
 				loc_hours_exp = local_var_from_map(conditions_t[1], grid_x, grid_y, bran.phytomers[-1])
 
 				(number_of_new_phytomers, length_of_new_phytomers) = self.calculate_rates(conditions_t[2],
 				 loc_irrad, loc_hours_exp, bran.terminal(), fila_de_parametros)
 				new_phytomers= number_of_new_phytomers() # cuantos van a salir
-				for new in range(new_phytomers): #antes de agregar los fitomeros que saldrian, puede salir una rama de este 
-					if bran in self.branches:  # puede que la rama ya no este por algun otro metodo que la borra
-						if bran.terminal() is True:#si es terminal
-							pnace =  beta.rvs(a=theta13, b=theta14,size=1)[0]#0.3371122
-							#pnace = norm.rvs(loc=0.3357790, scale=0.03192818, size=1)#esta es laultima,perono da buen resultado
+				for new in range(new_phytomers):
+					if bran in self.branches:
+						if bran.terminal() is True:
+							pnace =  beta.rvs(a=theta13, b=theta14,size=1)[0]
 						else: 
 							pnace = beta.rvs(a=theta13, b=theta14,size=1)[0] * norm.rvs(loc=theta9,scale= theta10)
-						if bernoulli.rvs(pnace, size=1)[0] == 1: # la rama se ramifica con probabilidad fija
-							self.add_branch(length_of_new_phytomers(), self.branches.index(bran)) #sale rama	
-						#independiente de si se ramifica o no se agregafitomero 
-						self.branches[self.branches.index(bran)].add_phyto(length_of_new_phytomers()) #se agregafitomero arama central
-						self.older_this_branch(1,bran, fila_de_parametros) #se envejece ramainicial
+						if bernoulli.rvs(pnace, size=1)[0] == 1:
+							self.add_branch(length_of_new_phytomers(), self.branches.index(bran))
+						self.branches[self.branches.index(bran)].add_phyto(length_of_new_phytomers())
+						self.older_this_branch(1,bran, fila_de_parametros) 
 
-	def refresh(self):  # trough the simulation if a plant turns too small to be alive, or if there are orphaned
-	#pointers (pointers that point to instances that are no longer part of an individual) this function deletes
-	#these the plants or parts of plants
-		for bran in self.branches: #remove pointer pointing at nothing
+	def refresh(self):  
+		for bran in self.branches:
 			for phy in bran.phytomers: 
-				if phy.branch_pointer:  # if there is a lateral branch
-					if phy.branch_pointer  not in self.branches: #if the pointer points at something not in the indidual
+				if phy.branch_pointer:
+					if phy.branch_pointer  not in self.branches:
 						branch_index = self.branches.index(bran)
 						phyt_index = self.branches[branch_index].phytomers.index(phy)
 						self.branches[branch_index].phytomers[phyt_index].delete_branch_out_here() # remove 
@@ -190,7 +159,7 @@ class zostera:
 			phyt.older(time)
 		#in a new loop (because eliminating a phytomer would mess the last loop) simulate the probability
 		#of dying by age of the first phytomer of a branch (the oldest)
-		die_at_age_prob = min(1,max(0,theta15+(theta16*bran.phytomers[0].age)))
+		die_at_age_prob = min(1,max(0,1/(1+math.exp(theta15+(theta16*bran.phytomers[0].age)))))#sigmoid model giving the 
 		#probability of dying at a certain age, the result may be a number higher than 1 or lower than 0
 		#but a probability need to be from 0 to 1, the min and max sets the limits
 		if bernoulli.rvs(die_at_age_prob, size=1)[0] == 1:  #if there is a success  at dying
@@ -469,7 +438,7 @@ def variables_map(world, irrad, hours_e):
     var_maps = [irradiance, hours_exp]#put together the generated maps
     return var_maps
 
-def load_ambient(file_name):  # read the file and organize it as a np array
+def load_ambient(file_name):
     route = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rt")
     data_csv = csv.reader(route, delimiter=",")
     data = [a for a in data_csv]
@@ -478,48 +447,35 @@ def load_ambient(file_name):  # read the file and organize it as a np array
     return data_np
 
 
-def load_meadow(file_name): #carga las zosteras de un output de una simulacion anterior
+def load_meadow(file_name):
 	place = open(os.getcwd() + os.sep + 'data' + os.sep + file_name, "rb")
 	output = pickle.load(place)
 	place.close()
 	meadow = output
 	return meadow
 
-def create_zosteras_from_csv(file_name): # crea zosteras con internododos detamanio x espcificados en el archivo
-	#el csv debe tener los datos de un rizoma por fila, las columnas son las primeras 2 las coordenadas, la 
-	#tercera la orientacion, y de la 4al final las longitudes de los internodos
-	#cargarel archivo
+def create_zosteras_from_csv(file_name): 
 	place = os.getcwd() + os.sep + 'data' + os.sep + file_name
 	internode_lengths = (pandas.read_csv(place, header=None).values)
 	created_zosteras =[]
-	#phytomer con  rhizome, branch, prev_fit, age, length, firstcoord, orient):
-	for individual in range(len(internode_lengths)):  #crear una zostera por cada fila
-		fila = internode_lengths[individual] #saco los datos de la long de cada internodo
-		lista = [phytomer(0, fila[3], [fila[0], fila[1]], fila[2])]  # creo el primer fitomero
+	for individual in range(len(internode_lengths)): 
+		fila = internode_lengths[individual]
+		lista = [phytomer(0, fila[3], [fila[0], fila[1]], fila[2])] 
 		rama = branch(lista)
-		created_zosteras.append(zostera([rama]))  #creo  la rama, la hago terminal , la hago zostera y la 
-		#meto a lista en una sola linea, ahora a esa zostera le voy a a gregar los fitomeros que faltan
-		for internod in range(4,len(fila)):  #por  cada fitomero que falta agregar
+		created_zosteras.append(zostera([rama]))
+		for internod in range(4,len(fila)): 
 			if not np.isnan(fila[internod]):
 				for internode_ages in created_zosteras[individual].branches[0].phytomers:
-					internode_ages.older(1)		#quiero que tengan la edad adecuada, osea en escalera, el mas viejo al final
-				created_zosteras[individual].branches[0].add_phyto(fila[internod]) #  a la zostera en cuestion le agrego el fitomero
-	#print("Pradera creada con %d individuos del archivo %s" %( len(internode_lengths), file_name))
+					internode_ages.older(1)	
+				created_zosteras[individual].branches[0].add_phyto(fila[internod]) 
 	return created_zosteras
 
 def local_var_from_map(var_map, grid_x, grid_y, phytomer):
-	# funcion para calcular la irradiancia o hex en un punto especifico, dado que
-	#el fitomero esta en un cierto punto de la matriz
 	loc_var = griddata((grid_y.ravel(), grid_x.ravel()), (var_map[:, :]).ravel(), (phytomer.coord[0][0], phytomer.coord[0][1]),
 	method='nearest') #si, le estoy dando primero la grilla de y y luego la dey,porque asi esta funcionando... no se por
 	return loc_var
 
 def data_saver(meadow ):
-	#crear los espacio para llenarse con los datos de cada tiempo, meadow es meddow, t es int con el indice de
-	#las coniciones ambientales del momento, date_str es el nombre de la fecha en fomrato "d/m/Y"
-	#hay dos tipos de variables a guardar: las que se guardan una vez por tiempo (numero
-	#de zosteras, temp, etc), y las que se guardan por cada fitomero (long, edad, etc: las 
-	#que se guardan por fitomero:
 	lengh_list = []
 	for zos in meadow:
 		this_ind=[]
@@ -529,30 +485,12 @@ def data_saver(meadow ):
 	return sum(lengh_list)/len(lengh_list)
 	
 def simulation(meadow, ambientales, var_maps, grid_x, grid_y, fila_de_parametros):
-	#simlacion es el ciclo principal que itera sobre el tiempo. cada tiempo t de la 
-	#serie de tiempo de concidionesambientales se desarrollan las zosteras de acuerdo a ese
-	#tiempo.
-	# simulation necesia una pradera, una serie de tiempo de ambiente, el mundo
-	#la malla en x y y, la indicacion se si  guardar o no, y opcinal el nombre del
-	#archivo si se va a guardar (args)
-	#ambientales vienen en dimensiones (t, 5), en orden esas 5 variables son: temp, anom, irrad, hex y timestamp
-	#var_maps  es una lista con dos np array de (x,y,t) donde x y y son las dimensiones espaciales y t la temporal, el primer
-	#elemento de la lista varmaps es el array con los datos de irrad en (x,y) y la seghunda las hexen (x,y) 
 	
-
-	for t in range(len(ambientales)):#tqdm(range(len(ambientales))): 
-		#plot_zosters(meadow) #grafica de como empezo
-		#print(len(meadow)) #activar alguna de estas quita el chiste a tqdm
+	for t in range(len(ambientales)):
 		
-		conditions_t = [var_maps[0][:,:,t], var_maps[1][:,:,t],ambientales[t]] #esta lista tiene los mapas de ambientales 
-		#al tiempo t, y las condiciones al tiempo t, se usa la misma para todas las zosteras:todas estan expuestas a lo mismo
-		
+		conditions_t = [var_maps[0][:,:,t], var_maps[1][:,:,t],ambientales[t]]
 		for zos in meadow:
-			zos.develop(conditions_t, grid_x, grid_y, fila_de_parametros)  # el develop necesita la lista de condiciones altiempo y las mallas
-			#en x y y parapoder interpolar.
-
-		#se guarda la pradera como estaba la pradera al terminar el desarrollo, osea, como si fuera
-		#al momento de la recaptura de los rizomas
+			zos.develop(conditions_t, grid_x, grid_y, fila_de_parametros) 
 		mean_len = data_saver(meadow)  # de ley para hacer grafica
 	return mean_len
 
@@ -572,8 +510,8 @@ n_row =  num_param + extra # the final number of n rows
 #to get the value of the entries of the matrix.
 rangos = np.zeros((num_param, 4), dtype=float ) #aqui va a estar en columnas el maximo de cada 
 #rango, y el valor original, el rango es el valor original mas menos 0.3 de ese valor
-rangos[:,1] = [2.15, 6.24, -0.79, 0.4781, -0.011, -0.740, 0.1513, -0.1302, 0.5642817,
-	 0.08255468,1.672517,10.34378, 65.09417,127.9993, -0.12249192, 0.03649965]#set of the actual parameter values
+rangos[:,1] = [2.912577, 6.24, -0.79, 0.4781, -0.011, -0.740, 0.1513, -0.1302, 0.5642817,
+	 0.08255468,1.672517,10.34378, 65.09417,127.9993, 4.43118758, -0.25859046]#set of the actual parameter values
 rangos[:,0]=rangos[:,1]-(rangos[:,1]*0.3) # inf limit
 rangos[:,2]=rangos[:,1]+(rangos[:,1]*0.3) # sup limit
 rangos[:,3]=(rangos[:,2]-rangos[:,0])/n_row # jump size
@@ -585,7 +523,13 @@ for f in range(n_row):
 		parametros[f, p] = rn.uniform((rangos[p,0]+(f*rangos[p,3])), (rangos[p,0]+((f+1)*rangos[p,3]))) # set a value in the range
 for p in range(num_param):#shuffle the columns
 	np.random.shuffle(parametros[:,p])
-np.savetxt('latin_hipercube.csv', parametros, delimiter=',') #save file, this file will be used in the computation of the correlation
+
+names = ["$n_{\\lambda}$", '$l_{\\sigma_{\\alpha}}$','$l_{\\sigma_{\\beta}}$', "$l_{\\mu_{T}}$", '$l_{\\mu_{T^{2}}}$',
+'$l_{\\mu_{A^{2}}}$', "$l_{\\mu_{I}}$",'$l_{\\mu_{H}}$', '$a_{shrink}$','$b_{shrink}$', '$a_{branchloss}$',
+'$b_{branchloss}$','$a_{branching}$',  '$b_{branching}$' ,'$m_{\\alpha}$','$m_{\\beta}$']
+
+hipercube_values = pandas.DataFrame(parametros,  columns=names)
+hipercube_values.to_csv('latin_hipercube.csv', index=False, header=True)
 
 #simulation using each of rows of parameter valueas input
 resultado = np.zeros((num_param+extra,1))

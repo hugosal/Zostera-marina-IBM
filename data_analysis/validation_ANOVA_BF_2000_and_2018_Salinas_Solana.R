@@ -26,12 +26,14 @@ bayes_anov_zostera<-function(simulated_file_name,observed_file_name){
     for (r in rhizome_number){
       rhizome_length[i,1]<-f
       rhizome_length[i,2]<-"Observed"
-      rhizome_length[i,3]<-sum(observed[which(observed[,1]==f & observed[,2]==r),3],
+      rhizome_length[i,3]<-sum(
+        observed[which(observed[,1]==f & observed[,2]==r),3],
                                na.rm = T)
       i<-i+1
       rhizome_length[i,1]<-f
       rhizome_length[i,2]<-"Simulated"
-      rhizome_length[i,3]<-sum(simulated[which(simulated[,1]==f & simulated[,2]==r),3],
+      rhizome_length[i,3]<-sum(
+        simulated[which(simulated[,1]==f & simulated[,2]==r),3],
                                na.rm = T)
       i<-i+1
     }} # compute the length of each rhizome as the sum of its internodes lengths 
@@ -43,7 +45,8 @@ bayes_anov_zostera<-function(simulated_file_name,observed_file_name){
   rhizome_length$date<-as.factor(rhizome_length$date)
   rhizome_length$type<-as.factor(rhizome_length$type)
   
-  an<-BayesFactor::anovaBF(lengths ~ date + type, data=rhizome_length,progress = F)#calculate BF
+  an<-BayesFactor::anovaBF(lengths ~ date + type, 
+                           data=rhizome_length,progress = F)#calculate BF
   
   result_vector<-rep(0,4) # initialize vector
   result_vector[1]<-BayesFactor::extractBF(an[1])[1]
@@ -57,9 +60,11 @@ set.seed(26)
 
 # for 2000
 observed2000<-"observed_rhizomes_2000.csv"# the observed rhizomes file
-files2000 <- list.files(path="outs2000/",full.names = T) # the directory with many simulated rhizome files
+# the directory with many simulated rhizome files
 
-out2000<-lapply(files2000,FUN = bayes_anov_zostera,observed_file_name=observed2000)
+files2000 <- list.files(path="outs2000/",full.names = T) 
+out2000<-lapply(files2000,FUN = bayes_anov_zostera,
+                observed_file_name=observed2000)
 out2000<-data.frame(matrix(unlist(out2000),nrow=length(out2000), byrow=T))
 
 files2000 <- list.files(path="outs2000/",full.names = F) # file names 
@@ -96,7 +101,9 @@ validation_tab<-cbind(data.frame(Factor=c("2000 Time",
                                           "2000 Type", "2000 Type+Type",
                                           "2000 Type+Type+TypeXTime",
                                           "2018 Time","2018 Type","2018 Type+Type",
-                                          "2018 Type+Type+TypeXTime")),validation_tab)
+                                          "2018 Type+Type+TypeXTime")),
+                      validation_tab)
 
-write.csv(validation_tab,file = "validation_BF_table.csv")
+write.csv(validation_tab,file = "validation_rhiz_length_BF_table.csv", 
+          row.names = F)
 

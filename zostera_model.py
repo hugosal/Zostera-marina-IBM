@@ -45,7 +45,7 @@ class zostera:
 
 			# in python gamma distribution  is parametrized with  a=loc y shape= rate=1/beta
 			def number_of_new_phytomers():
-				mean_y = 2.154482 # lambda parameter is constant 
+				mean_y = 2.912577# lambda parameter is constant 
 				new_phytomers = poisson.rvs(mean_y)
 				return new_phytomers
 
@@ -150,7 +150,7 @@ class zostera:
 			phyt.older(time)
 		#in a new loop (because eliminating a phytomer would mess the last loop) simulate the probability
 		#of dying by age of the first phytomer of a branch (the oldest)
-		die_at_age_prob = min(1,max(0,-0.12249192+(0.03649965*bran.phytomers[0].age)))#lineal regression giving the 
+		die_at_age_prob = min(1,max(0, 1/(1+math.exp(4.43118758+(-0.25859046*bran.phytomers[0].age)))))#sigmoid model giving the 
 		#probability of dying at a certain age, the result may be a number higher than 1 or lower than 0
 		#but a probability need to be from 0 to 1, the min and max sets the limits
 		if bernoulli.rvs(die_at_age_prob, size=1)[0] == 1:  #if there is a success  at dying

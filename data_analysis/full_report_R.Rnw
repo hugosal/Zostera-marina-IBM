@@ -8,10 +8,10 @@
 
 \documentclass{article}
 \usepackage{authblk}
-
+\usepackage{multirow}
 \author[1]{Salinas, Hugo}
 \author[1]{Solana-Arellano, Elena}
-\affil[1]{Centro de Investigaci\'on Cient\'ifica y Educaci\'on Superior de Ensenada (CICESE), P.O. Box 430222, San Ysidro, CA 92143. esolana@cicese.mx. Tel: 01(646)1750500, Fax: 1744729}
+\affil[1]{Centro de Investigaci\'on Cient\'ifica y Educaci\'on Superior de Ensenada (CICESE), P.O. Box 430222, San Ysidro, CA 92143. esolana@cicese.mx, hugosal@comunidad.unam.mx}
 
 \setcounter{Maxaffil}{0}
 \renewcommand\Affilfont{\itshape\small}
@@ -41,88 +41,171 @@
 
 \tableofcontents
 
-\section{Ambient conditions data processing}
+The following scripts and datasets can be obtained from https://github.com/hugosal/Zostera-marina-IBM
+
+\section{Environmental conditions data processing}\label{Environmental conditions data processing}
 The observations of seagrass growth were modeled as a function of environmental conditions. 
 To do this, singular values of the environmental conditions during a fortnight were necessary; this section describes the way these values were obtained from the available data.
 
 The time series of the environmental variables data used in the parametrization is shown in Figure \ref{fig_ambientales}.
-A summary of these variables is presented in Table %\ref{tab:environment_summary}.
-
-\begin{figure}[p]
-\centering2\includegraphics{full_report_R-fig_ambientales}
-\caption{Time series of environmental conditions data used in the parametrization. The X-axis is date of fortnight. Blue circles series indicate Sea surface Temperature ($^{\circ}$C), green triangles series indicate Global horizontal irradiance (kWm$^2$fortnight$^-1$), red crosses indicate hours of air exposition at a 0.5 m depth, and purple diamonds indicate sea surface temperature anomaly ($^{\circ}$C)} \label{fig_ambientales}
-\end{figure}
+A summary of these variables is presented in Table \ref{tab:environment_summary}.
 
 <<fig_ambientales,echo=F,fig=T,include=F,eval=T>>=
-# chunk tomake a plot of the enviromental conditions used
-growth <- read.csv("new_internode_lenght_and_environmental.csv",header=T)
-growth<-growth[complete.cases(growth), ]
-dates<-unique(growth$date_stamp)
-timest<-as.Date(as.POSIXct((dates - 719529)*86400, 
-                           origin = "1970-01-01"))
-temp<-c()
-irrad<-c()
-hex<-c()
-anom<-c()
-for (yr in dates){
-  temp<-c(temp,growth$SST[growth$date_stamp==yr][1])
-  irrad<-c(irrad,growth$irradiance[growth$date_stamp==yr][1])
-  hex<-c(hex,growth$exposition_hours[growth$date_stamp==yr][1])
-  anom<-c(anom,growth$SSTA[growth$date_stamp==yr][1])
-}
-par(mar=c(5, 4, 4, 15), xpd=F)
-plot(dates, temp, axes=F, xlab="", ylab="",type="b",lwd=2,
-     col="#0096f6ff",main = "")
-grid()
-axis(2, ylim=c(min(temp),max(temp)),col="#0096f6ff",lwd=2,
-     xlim=c(dates[1]-1,dates[32]+1),line = 0)
-
-par(new=T)
-plot(dates, irrad, axes=F, ylim=c(min(temp),max(irrad)), xlab="", ylab="", 
-     type="b", main="",lwd=2,col="#8eff12ff")
-axis(2, ylim=c(0,max(irrad)),lwd=2,line=2,col="#8eff12ff")
-
-par(new=T)
-plot(dates, hex, axes=F, ylim=c(min(hex),max(hex)), xlab="", ylab="", 
-     type="b", main="",lwd=2,col="#e60000")
-axis(4, ylim=c(min(hex),max(hex)),lwd=2,line=0,col="#e60000")
-
-par(new=T)
-plot(dates, anom, axes=F, ylim=c(min(anom),max(anom)), xlab="", ylab="", 
-     type="b", main="",lwd=2,col="#b300b3")
-axis(4, ylim=c(min(anom),max(anom)),lwd=3,line=2,col="#b300b3")
-
-axis(1,dates,labels = timest,las=3)
-par(xpd=TRUE)
-legend("right", inset=c(-1.3,0),legend = c("Temperature (°C)",as.expression(bquote("Irrad (kW "~fortnight^-1~m^-2*~")")),
-    as.expression(bquote("Exposition hours (h "~fortnight^-1*~")")),"Temperature anomaly (°C)"), 
-       fill =c("#0096f6ff", "#8eff12ff","#e60000","#b300b3"),cex = 0.7,       ncol = 1,
-       xpd = T)
-write.csv(data.frame(temperature=temp,irradiance=irrad,temperature_anomaly=anom),
-          "environment_data.csv")
-
+source("environmental_time_series_plot_2000_Salinas_Solana.R")
 @
+
+\begin{figure}[p]
+\centering\includegraphics[width=129mm]{fig_environmental_time_Series}
+\caption{Water temperature, Irradiance, and \textit{Z. marina} growth variables Mean length of internodes and Mean number of new phytomers (points are mean and error bars a standard deviation) per date of 1999-2000 and 2018 (Day/Month). 
+		Raw data of water temperature anomaly and irradiance were obtained respectively from the IRI/LDEO Climate Data Library, and National Renewable Energy Laboratory.} \label{fig_ambientales}
+\end{figure}
 
 \subsection{Sea surface temperature anomaly (SSTA)}
 For the required fortnights, each day was assigned the corresponding observed value of biweekly SSTA in the database, and the mean SSTA during the $\sim 15 $ days of the sampling period was calculated; this was the value used as the observed SSTA at each fortnight.
 
-\subsection{Irrdiance (GHI)}
+\subsection{Irradiance (GHI)}
 The irradiance obtained corresponded to hourly Irradiance measures (Wm$^2$).
 The irradiance in the fortnight was the sum of the hourly irradiance each hour during the fortnight.
 
 \subsection{Hours of air exposition (HEX)}
-The marked rhizomes were located in the higher part of the meadow, assuming the measures were made at a depth of maximum 50 cm, the hours of exposure to air were the number of hours that the sea level was equal or lower than this level.
+The sampled plants were located at a depth of approximately $+0.5$ m. 
+	For each of the fortnights we counted the number of hours were the sea level was lower than this depth. 
 
 <<environment_table,echo=F,eval=T,results=tex>>=
 # table of the summary of the environmental variables
-print(xtable::xtable(summary(read.csv("environment_data.csv",header = T)),caption="Summary of environmental variables observed in 2000",label = "tab:environment_summary"),include.rownames=F)
+print(xtable::xtable(summary(read.csv("environment_data.csv", header = T, 
+                                      row.names = 1)),
+                     caption="Summary of environmental variables observed in 2000",label = "tab:environment_summary"), include.rownames=F, latex.environments = "center")
 @
+
+\section{Submodel selection}
+The length of new internodes and number of new phytomers are related to environmental conditions.
+To test if the observations of these variables can be predicted using the environmental conditions  we used a model selection process.
+We selected the best version of each submodel from a non-exhaustive  set of possible submodels that include some of the variables described in section \ref{Environmental conditions data processing}.
+The model selection consisted of starting with a model that included only a constant value (intercept), this model was parameterized and then compared to a model that included one more variable.
+If the second model was better than the first, the new submodel was selected as the best version and the process was repeated with a new possible submodel version.
+To select the best of the two submodels we used a hypothesis test on the value of the parameters in the submodel and the penalized deviance criterion (DIC).
+
+The hypothesis tests consisted in confirming that the parameters of the model had a 95\% credible interval that does not include 0, this would indicate that a null hypothesis on the value of the parameter is different from zero cannot be rejected.
+If all of the parameters of the submodel version passed the hypothesis test, the submodel version with the lowest DIC was selected.
+The number of new phytomers was modeled as a Poisson distributed variable, with an $n_{\lambda}$ parameter. 
+This parameter might be related to environmental conditions. Therefore, the model selection was used to determine which variables ($X_i$) with coefficients ($\beta_i$) were to be included in the model as linear predictors for the parameter $n_{\lambda}$:
+\[n_{\lambda}=\beta_0+\beta_1X_1+\beta_2X_2\hdots  \]
+The following script (\textit{model\_selection\_n\_phyt.R}) can be used to re-create the selection for the number of new phytomers submodel.
+
+<<new_phyt,echo=F,eval=T>>=
+cat(readLines("model_selection_n_phyt.R"), sep = "\n")
+@
+
+The length of the new internodes submodel was modeled as a Gamma distributed variable, with a shape ($\alpha$) and rate ($\theta$) parameters that are a function of the distribution mean ($\mu$) and standard deviation ($\sigma$):
+
+\[ \alpha=\frac{\mu^{2}}{\sigma^{2}},\]
+\[\theta=\frac{\mu}{\sigma^{2}},\]
+
+The standard deviation was:
+
+\[\sigma=l_{\sigma_{\alpha}}+l_{\sigma_{\beta}} A^{2}, \]
+where $A$ is the water temperature anomaly, as it was established by a previous model selection process.
+The model selection was used to determine which variables ($X_i$) with coefficients ($\beta_i$) were to be included as linear predictors for the mean of the distribution:
+\[\mu=\beta_0+\beta_1X_1+\beta_2X_2\hdots  \]
+The following script (\textit{model\_select\_length\_phyt.R}) can be used to re create the information used for the selection of the length of new internodes submodel version.
+
+<<new_phyt,echo=F,eval=T>>=
+cat(readLines("model_select_length_phyt.R"), sep = "\n")
+@
+
+The results of the submodel selection process are shown in Tables \ref{table_selection_n_phyt} and \ref{table_selection_length}.
+According to these results, the best versions of the submodels that describe the number of new phytomers and new internode length are respectively number one and eight.
+
+\clearpage
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+Version & DIC & Variable & Parameter 95\% CI lwr & Parameter 95\% CI up \\ \hline
+1 & 340.2 & Intercept & 0.950195552 & 1.176343063 \\ \hline
+\multirow{2}{*}{2} & \multirow{2}{*}{340} & Intercept & 0.988051636 & 1.273521087 \\
+ &  & SSTA2 & -0.069568319 & 0.009963621 \\ \hline
+\multirow{2}{*}{3} & \multirow{2}{*}{340.5} & Intercept & 0.92123082 & 1.744926205 \\
+ &  & SSTA & -0.001903774 & 0.000368755 \\ \hline
+\multirow{3}{*}{4} & \multirow{3}{*}{341.5} & Intercept & -0.305907541 & 1.97460911 \\
+ &  & SSTA & -0.003109891 & 0.005055975 \\
+ &  & SSTA2 & -0.203585505 & 0.07762298 \\ \hline
+\multirow{2}{*}{5} & \multirow{2}{*}{340.2} & Intercept & 0.977681459 & 1.374658532 \\
+ &  & SST2 & -0.226494645 & 0.03996529 \\ \hline
+\multirow{2}{*}{6} & \multirow{2}{*}{341.3} & Intercept & 0.583563478 & 1.933063678 \\
+ &  & GHI & -0.004899126 & 0.002458319 \\ \hline
+\multirow{2}{*}{7} & \multirow{2}{*}{342.3} & Intercept & 0.876425795 & 1.258650412 \\
+ &  & Hex & -0.005253072 & 0.005191596 \\ \hline
+\multirow{2}{*}{8} & \multirow{2}{*}{340.4} & Intercept & 0.732421364 & 2.359169489 \\
+ &  & SST & -0.06948227 & 0.017809427 \\ \hline
+\end{tabular}
+\caption{Number of new phytomers submodel versions comparison. For each version of the submodel, the deviance information criterion (DIC) is presented, and for each of its variable parameters' 95\% CI. }
+\label{table_selection_n_phyt}
+\end{table}
+
+\clearpage
+\begin{table}
+\centering
+\begin{tabular}{|l|l|l|l|l|}
+\hline
+Version & DIC & Variable & 95 CI lower & 95 CI upper \\ \hline
+\multirow{4}{*}{1} & \multirow{4}{*}{6000} & Intercept & 4.778824367 & 8.624347487 \\
+ &  & SST & 0.24867632 & 0.434696007 \\
+ &  & $\sigma_{\alpha}$ & 5.846045526 & 6.524504471 \\
+ &  & $\sigma_{\beta}$ & -0.677546656 & -0.008202484 \\ \hline
+\multirow{3}{*}{2} & \multirow{3}{*}{6056} & SST & 0.637892196 & 0.675767198 \\
+ &  & $\sigma_{\alpha}$ & 5.84155394 & 6.524592213 \\
+ &  & $\sigma_{\beta}$ & -0.60730044 & 0.106639349 \\ \hline
+\multirow{4}{*}{3} & \multirow{4}{*}{5999} & SST & 0.98883093 & 1.228479812 \\
+ &  & SST2 & -0.026732448 & -0.015760333 \\
+ &  & $\sigma_{\alpha}$ & 5.872055528 & 6.552752028 \\
+ &  & $\sigma_{\beta}$ & -0.692948682 & -0.044162355 \\ \hline
+\multirow{5}{*}{4} & \multirow{5}{*}{5981} & SST & 0.848705192 & 1.1076595 \\
+ &  & SST2 & -0.020931689 & -0.008985562 \\
+ &  & SSTA & -1.683660958 & -0.660692882 \\
+ &  & $\sigma_{\alpha}$ & 5.920296515 & 6.619337113 \\
+ &  & $\sigma_{\beta}$ & -0.973559531 & -0.319692942 \\ \hline
+\multirow{6}{*}{5} & \multirow{6}{*}{5979} & SST & 0.877130706 & 1.146892664 \\
+ &  & SST2 & -0.021983365 & -0.009761399 \\
+ &  & SSTA & -1.43949427 & -0.331723726 \\
+ &  & SSTA2 & -0.975987407 & -0.046320372 \\
+ &  & $\sigma_{\alpha}$ & 6.00031155 & 6.731316405 \\
+ &  & $\sigma_{\beta}$ & -1.107365159 & -0.494176915 \\ \hline
+\multirow{7}{*}{6} & \multirow{7}{*}{5972} & SST & 0.806189608 & 1.089436029 \\
+ &  & SST2 & -0.026363623 & -0.013261135 \\
+ &  & SSTA & -1.56767992 & -0.459270694 \\
+ &  & SSTA2 & -1.242667853 & -0.260782001 \\
+ &  & GHI & 0.011059569 & 0.064087282 \\
+ &  & $\sigma_{\alpha}$ & 5.994769743 & 6.716978075 \\
+ &  & $\sigma_{\beta}$ & -1.105745249 & -0.508724186 \\ \hline
+\multirow{8}{*}{7} & \multirow{8}{*}{5941} & SST & 0.234846204 & 0.6596395 \\
+ &  & SST2 & -0.017070879 & -0.003303101 \\
+ &  & SSTA & -0.992905667 & 0.163182334 \\
+ &  & SSTA2 & -1.101183713 & -0.108238564 \\
+ &  & GHI & 0.100685769 & 0.191124548 \\
+ &  & Hex & -0.164508348 & -0.081618559 \\
+ &  & $\sigma_{\alpha}$ & 5.871397008 & 6.572274208 \\
+ &  & $\sigma_{\beta}$ & -1.065328351 & -0.477027039 \\ \hline
+\multirow{7}{*}{8} & \multirow{7}{*}{5942} & SST & 0.243168086 & 0.672039089 \\
+ &  & SST2 & -0.018045269 & -0.00420993 \\
+ &  & SSTA2 & -1.189994057 & -0.234353762 \\
+ &  & GHI & 0.108118147 & 0.200094577 \\
+ &  & Hex & -0.171868178 & -0.092063752 \\
+ &  & $\sigma_{\alpha}$ & 5.890834556 & 6.597579499 \\
+ &  & $\sigma_{\beta}$ & -1.083957924 & -0.491915815 \\ \hline
+\end{tabular}
+\caption{Length of new internode submodel version comparison. For each version of the submodel, the deviance information criterion (DIC) is presented and for each of its variable parameters' 95\% CI.}
+\label{table_selection_length}
+\end{table}
+
+
 
 \section{Submodels and Parametrization}
 The Data files used in the following sections are available at (dx.doi.org/10.17632/zgx8bshzy2.1).
-The posterior distribution of the parameters of the submodels were approximated using  Gibbs sampling.
-Sampling was made using the JAGS program (4.3.0) and the runjags package (2.0.4) in R (3.6.1).
-The sampling was made using three MCMC chains, with a Burn-in of 10\% of the total sampling, and 5000 iterations for adaptation and a thining of 10.
+The posterior distribution of the parameters of the submodels was approximated using  Gibbs sampling.
+Sampling was made using the JAGS program (4.3.0) and the runjags package (2.0.4) in R (4.0.3).
+The sampling was made using three MCMC chains, with a Burn-in of 10\% of the total sampling, and 5000 iterations for adaptation, and a thining of 10.
 The number of iterations for sampling was adjusted to obtain a satisfactory convergence for each submodel.
 The convergence was asses visually and with the potential scale reduction factor.
 The following submodels were selected from a non-extensive group of candidates based on a Bayesian hypothesis test on the existence of its parameters, the deviance information criterion (DIC), and Leave-One-Out cross-validation (LOO).
@@ -132,71 +215,40 @@ In the following sections, the submodels are described, and the R code used for 
 \subsection{Number of new phytomers}
 
 The number of leaves added to each rhizome during a fortnight was assumed to equal that of new phytomers ($n_{i}$).
-A histogram of the number of leaves data used of the parameterization is shown in Figure \ref{hist_new_leaves}.
-The variable number of new phytomers was assumed to have a Poisson distribution to represent the number of successes expected, with success being the addition of a new leave/phytomer.
-This distribution is shaped by a $n_{\lambda}$ parameter.
+A histogram of the number of leaves data used for the parameterization is shown in Figure \ref{hist_new_leaves}.
+The variable number of new phytomers was assumed to have a Poisson distribution which represent the number of successes expected, with success being the addition of a new leave/phytomer.
+This distribution is shaped by an $n_{\lambda}$ parameter.
 The JAGS submodel and its sampling method are shown next.
 This model was sampled for 5000 iterations, with non-informative prior on the parameter.
 The result of the sampling is presented in Table \ref{table_length_sample}.
 Due to the low deviation of the parameter $n_{\lambda}$, its value was considered as a constant equal to the mean of the parameter distribution.
 
-\begin{figure}[b]
-<<data_new_leaves,echo=F,eval=T,fig=T,include=T,height=4,width=4>>=
+<<data_new_leaves,echo=F,eval=T,fig=T,include=F,height=4,width=4>>=
 # histogram of the number of new leaves
-growth <- read.csv("internodes_and_branches_2000.csv",header=T)
+growth <- read.csv("internodes_and_branches_2018_environment.csv",header=T)
 new_leaves<-growth$new_leaves_number
-hist(new_leaves,main="",col="gray",breaks=seq(0,6,l=7),xlab="New leaves per rhizome in a fortnight",cex=0.3,ylim=c(0,200))
+hist(new_leaves,main="",col="gray",breaks=seq(0,6,l=7),xlab="New leaves per rhizome in a fortnight",cex=0.3)
 @
-\caption{Histogram of the number of leaves added to a rhizome during a fortnight in the year 2000}\label{hist_new_leaves}
+
+\begin{figure}[b]
+\centering\includegraphics[width=129mm]{full_report_R-data_new_leaves}
+\caption{Histogram of the number of leaves per rhizome per fortnight in the year 2018}\label{hist_new_leaves}
 \end{figure}
+The script  (\textit{number\_new\_leaves\_JAGS\_sampling\_Salinas\_Solana.R}) that was used to sample this submodel is the following:
 
-<<new_phyt,echo=T,eval=F>>=
-# chunk to sample from the number of new leaves model
-library(runjags) # load necessary package
-# for this process to work , the jags program must be installed
-# http://mcmc-jags.sourceforge.net/
-growth <- read.csv("internodes_and_branches_2000.csv",header=T)
-new_leaves<-growth$new_leaves_number 
-
-data_list <- list(
-  new_leaves = new_leaves,
-  ntotal = length(new_leaves)) 
-
-model_num <-"model {
-for ( i in 1:ntotal ) {
-new_leaves[i]~dpois(lambda)
+<<new_phyt,echo=F,eval=T>>=
+if (!file.exists("number_new_leaves_JAGS_output.csv")){
+  source("number_new_leaves_JAGS_sampling_Salinas_Solana.R")
 }
-lambda~dunif(0, 10)
-}" 
-
-
-writeLines(model_num, con="model_number_new_leaves_JAGS.txt" ) 
-
-parameters<-c("lambda") # which parameterrs to monitor
-adaptSteps <- 5000 # number of adapt iteration
-num_iter<-5000 #number or sampling iterations
-burn_in <- num_iter*0.1 #burn in
-thinSteps<-10 #thining 
-num_chain<-3 #number of chains to use
-set.seed(26)
-runJagsOut <- run.jags( model="model_number_new_leaves_JAGS.txt", 
-                        monitor=parameters, 
-                        data=data_list,  
-                        n.chains=num_chain,
-                        adapt=adaptSteps,
-                        burnin=burn_in, 
-                        sample=num_iter,
-                        thin=thinSteps,
-                        summarise=FALSE,
-                        plots=FALSE,silent.jags = T) # sample
-
-write.csv(x = summary(runJagsOut),"number_new_leaves_JAGS_output.csv")
+cat(readLines("number_new_leaves_JAGS_sampling_Salinas_Solana.R"), sep = "\n")
 @
 
 
-<<echo = F, results = tex>>=
-a<-read.csv("number_new_leaves_JAGS_output.csv")
-xtable::xtable(a,caption="Distribution summary of the parameter from the 'number of new phytomers' submodel",label = "table_length_sample",digits=3)
+<<echo = F, results = tex, eval=T>>=
+a<-read.csv("number_new_leaves_JAGS_output.csv", row.names = 1)
+rownames(a) <- '$n_{\\lambda}$'
+print(xtable::xtable(a, caption="Distribution summary of the parameter $n_{\\lambda}$ from the 'number of new phytomers' submodel",label = "table_length_sample", 
+                     digits=3), sanitize.rownames.function = function(x){x})
 @
 
 
@@ -208,7 +260,7 @@ The internodes born at the time $i$ are assumed to be the first $n_{i}$ number o
 A histogram of the observed internode length is shown in Figure \ref{hist_length}.
 The length of those first $n_{i}$ internodes per rhizome was assumed to be affected only by the environment during the fortnight $i$.
 The variable internode length was modeled as gamma-distributed to represent the waiting time (elongation) between successes (addition of a new phytomer).
-The mean ($\mu$) and standard deviation ($\sigma$) of this distribution are the polynomial:
+The mean ($\mu$) and standard deviation ($\sigma$) of this distribution are the polynomials:
 	\begin{equation}
 	\mu_{i}=l_{\mu_{T}}T_{i}+l_{\mu_{T^{2}}} T_{i}^{2}+l_{\mu_{A^{2}}} A_{i}^{2}+l_{\mu_{I}} I_{i}+l_{\mu_{H}} H_{i},
 	\end{equation}
@@ -218,167 +270,71 @@ The mean ($\mu$) and standard deviation ($\sigma$) of this distribution are the 
 	\end{equation}
 where $T$ is the water temperature, $A$ is the water temperature anomaly, $I$ is the irradiance, and $H$ is the number of air exposure hours over a fortnight.
 The submodel is used to approximate the value of the parameters $l_{\mu_{T}}$, $l_{\mu_{T^{2}}}$, $l_{\mu_{A^{2}}}$, $l_{\mu_{I}}$, $l_{\mu_{H}}$, $l_{\sigma_{\alpha}}$, and $l_{\sigma_{\beta}}$.
-The data used to sample this model was a set of observations of internode lengths ($l_{i}$, mm) made during the fortnight $i$, and the sate of environmental conditions of SST ($^{\circ}$C), SSTA ($^{\circ}$C), GHI (kWm$^2$fortnight$^-1$), and HEX, and some of their quadratic forms, during the fortnight.
+The data used to sample this model was a set of observations of internode lengths ($l_{i}$, mm) made during the fortnight $i$, and the state of environmental conditions of SST ($^{\circ}$C), SSTA ($^{\circ}$C), GHI (kWm$^2$fortnight$^-1$), and HEX, and some of their quadratic forms, during the fortnight.
 This submodel was sampled for 7000 iterations, with non-informative priors on the parameters.
 The results of the sampling are shown in Table \ref{table_growth_length}.
 Due to the low deviation of the mentioned parameters, its value was considered as a constant equal to the mean of the parameter distribution.
 
-\begin{figure}[ht]
-<<data_new_leaves,echo=F,eval=T,fig=T,include=T,height=4,width=4>>=
+
+<<data_lenght_internode,echo=F,eval=T,fig=T,include=F>>=
 #chunk to make an histogram of the length of new internodes
 growth <- read.csv("new_internode_lenght_and_environmental.csv",header=T)
 growth<-growth[complete.cases(growth),]
 internode_length<-growth$length_of_internode
-hist(internode_length,main="",col="gray",xlab="Internode length of new phytomers (mm)",cex=0.3,xlim=c(0,50),ylim=c(0,500))
+hist(internode_length,main="",col="gray",xlab="Internode length of new phytomers (mm)",cex=0.3,xlim=c(0,50))
 @
-\caption{Histogram of the Internode length of new phytomers in 2000}\label{hist_length}
+
+
+\begin{figure}[ht]
+\centering\includegraphics[width=129mm]{full_report_R-data_lenght_internode}
+\caption{Histogram of the length of new internodes during the year 2000}\label{hist_length}
 \end{figure}
 
-<<growth_lengh,eval=F,echo=T>>=
-#sampling of the length of new internodes model
-library(runjags)
-growth <- read.csv("new_internode_lenght_and_environmental.csv",header=T)
-growth<-growth[complete.cases(growth),]
+The following  script (\textit{length\_of\_new\_internodes\_JAGS\_sampling\_Salinas\_Solana.R}) was used to sample this submodel:
 
-zlong<-growth$length_of_internode
-GHI<-growth$irradiance[zlong>0 & zlong<50]
-Hex<-growth$exposition_hours[zlong>0 & zlong<50]
-Temp<-growth$SST[zlong>0 & zlong<50]
-Temp_anom<-growth$SSTA[zlong>0 & zlong<50]
-internode_length<-zlong[zlong>0 & zlong<50]
-Temp2<-Temp^2
-Temp_anom_2<-Temp_anom^2
-
-my_data_frame<-data.frame(internode_length,Temp,Temp2,Temp_anom_2,GHI,Hex)
-indep<-as.matrix(my_data_frame[,2:length(my_data_frame)],
-                 ncol=dim(my_data_frame)[2])
-depen<-my_data_frame[,1]
-
-data_list <- list(
-  x = indep ,
-  l = depen ,
-  Nx = dim(indep)[2] ,
-  ntotal = dim(indep)[1],
-  ssta_squared=Temp_anom_2)
-
-model_length <-"model{
-for(i in 1:ntotal){
-l[i]~dgamma(mu[i]^2/sigma[i]^2,mu[i]/sigma[i]^2)
-mu[i]<-sum(beta[1:Nx]*x[i,1:Nx])
-sigma[i]<-alfasig+betasigma*ssta_squared[i]
+<<growth_lengh,eval=T,echo=F>>=
+if (!file.exists("model_length_new_internodes_JAGS_output.csv")){
+  source("length_of_new_internodes_JAGS_sampling_Salinas_Solana.R")
 }
-alfasig~dunif(0,10)
-betasigma~dnorm(0,1/2^2)
-for(j in 1:Nx){
-beta[j]~dnorm(0,1/2^2)}
-}"
-
-writeLines(model_length , con="model_length_new_internodes_JAGS.txt" )
-
-parameters <- c("beta","betasigma","alfasig") 
-burn_in <- 5000 
-num_iter<-5000
-adaptSteps <-num_iter*0.1
-thinSteps<-10
-num_chains<-3
-
-regresion_init<-lm(depen~indep-1)
-initial <- list(
-  beta = regresion_init$coef,        
-  betasigma = sqrt(mean(regresion_init$resid^2)))
-
-set.seed(26)
-
-runJagsOut <- run.jags(model="model_length_new_internodes_JAGS.txt" ,
-                       monitor=parameters ,
-                       data=data_list ,
-                       n.chains=num_chains ,
-                       adapt=adaptSteps ,
-                       burnin=burn_in , 
-                       sample=num_iter ,
-                       thin=thinSteps ,inits = initial,
-                       summarise=FALSE ,silent.jags = T,
-                       plots=FALSE )
-
-write.csv(x = summary(runJagsOut),"model_length_new_internodes_JAGS_output.csv")
-
+cat(readLines("length_of_new_internodes_JAGS_sampling_Salinas_Solana.R"), sep = "\n")
 @
 
-<<echo = F, results = tex>>=
-a<-read.csv("model_length_new_internodes_JAGS_output.csv")
+<<echo = F, results = tex, eval=T>>=
+a<-read.csv("model_length_new_internodes_JAGS_output.csv", row.names = 1)
 rownames(a)<-c("$l_{\\mu_{T}}$", "$l_{\\mu_{T^{2}}}$", "$l_{\\mu_{A^{2}}}$", "$l_{\\mu_{I}}$", "$l_{\\mu_{H}}$","$l_{\\sigma_{\\beta}}$","$l_{\\sigma_{\\alpha}}$")
-print(xtable::xtable(a,caption="Distribution of the parameters from the 'length of new internodes' submodel",label = "table_growth_length",digits=3),sanitize.rownames.function = function(x){x},table.placement="p")
+print(xtable::xtable(a,caption="Distribution of the parameters from the 'length of new internodes' submodel",label = "table_growth_length",digits=3),sanitize.rownames.function = function(x){x},table.placement="h" )
 @
 
 \subsection{Probability of branching and branch loss}
 The model simulates the addition and removal of lateral branches of rhizomes with a certain probability ($p_{branching}$, $p_{loss}$); this submodel described said process.
 The parameterization of this submodel was done with data of the initial and final number of lateral branches after a fortnight per rhizome.
 The model assumes that a lateral branch can only initiate when a new phytomer is added to the current rhizome or lateral branch.
-The number of lateral branches that are added on a rhizome during a fortnight was modeled as a binomial variable with a probability of success ($p_{born}$) and the number of trials equal to the new phytomers ($n$) times the number of initial branches. 
+The number of lateral branches that are added on a rhizome during a fortnight was modeled as a binomial variable with a probability of success ($p_{born}$) and the number of trials equal to the new phytomers ($n$) times the number of initial branches.
 The number of branches lost in a fortnight was modeled as a binomial variable, with a probability of success ($p_{loss}$)  and the number of trials equal to the number of initial lateral branches.
 The parameters $p_{born}$ and $p_{loss}$ are modeled as beta distributions.
-The number of branches at the end of the fortnight was modeled as a variable with Poisson distribution with mean equal to the number of initial branches minus branches lost plus the added branches.
+The number of branches at the end of the fortnight was modeled as a variable with Poisson distribution with a mean equal to the number of initial branches minus branches lost plus the added branches.
 This submodel was sampled for 10000 iterations, with non-informative priors on the parameters.
 The results of the sampling are shown in Table \ref{table_branching_sample}.
+The following  script (\textit{number\_new\_branches\_JAGS\_sampling\_Salinas\_Solana.R}) was used to sample this submodel:
 
-<<branch_and_branch_mort,echo=T,eval=F>>=
-# chunk to sample from the Probability of branching and branch loss
-#model
-library(runjags)
-growth <- read.csv("internodes_and_branches_2000.csv",header=T)
 
-n_branch<-growth$new_branches_per_branch 
-initial_branches<-growth$number_initial_branches[!(is.nan(n_branch))]
-n<-growth$new_leaves_number[!(is.nan(n_branch))]
-final_branches<-growth$number_final_branches[!(is.nan(n_branch))]
-
-data_list <- list(
-  final_branches = final_branches,
-  n=n,
-  initial_branches=initial_branches,
-  ntotal = length(initial_branches))
-
-branch_model <-"model {for (i in 1:ntotal){
-final_branches[i]~dpois(initial_branches[i]+born_branches[i]-lost_branches[i])
-born_branches[i]~dbinom(p_branch, n[i]*initial_branches[i])
-lost_branches[i]~dbinom(p_loss,initial_branches[i]-1)
+<<branch_and_branch_mort,echo=F,eval=T>>=
+if (!file.exists("number_new_branches_JAGS_output.csv")){
+  source("number_new_branches_JAGS_sampling_Salinas_Solana.R")
 }
-p_branch~dbeta(1,1)
-p_loss~dbeta(1,1)}
-"
-writeLines(branch_model, con="model_number_new_branches_JAGS.txt")
-
-parameters<-c("p_branch", "p_loss")
-burn_in <- 5000 
-num_iters<-10000
-adaptSteps <- num_iters*0.1 
-thinSteps<-10
-num_chains<-3
-runJagsOut <- run.jags( model="model_number_new_branches_JAGS.txt", 
-                        monitor=parameters, 
-                        data=data_list,  
-                        n.chains=num_chains,
-                        adapt=adaptSteps,
-                        burnin=burn_in,
-                        sample=num_iters,
-                        thin=thinSteps,silent.jags = T,
-                        summarise=FALSE,
-                        plots=FALSE )
-
-
-write.csv(x = summary(runJagsOut),"number_new_branches_JAGS_output.csv")
+cat(readLines("number_new_branches_JAGS_sampling_Salinas_Solana.R"), sep = "\n")
 @
 
-<<echo = F, results = tex>>=
+<<echo = F, results = tex, eval=T>>=
 a<-read.csv("number_new_branches_JAGS_output.csv")
-print(xtable::xtable(a,caption="Sampling of brnaching model",label = "table_branching_sample"),table.placement="p")
+print(xtable::xtable(a,caption="Sampling of branching model",label = "table_branching_sample"))
 @
 
  The sampling approximates the distribution mean and standard deviation of the parameters $p\_branch$, and $p\_loss$.
  The beta distribution can be parametrized with $a$ and $b$ parameters.
  These parameters are the ones used in the python random number generators.
  The values of $a$ and $b$ for the probability or branching and branch loss can be computed from the mean ($\mu$) and variance ($\sigma^{2}$) as:
- 
+
  \[
  a = \left(\frac{1-\mu}{\sigma^{2}-\frac{1}{\mu}}\right)\mu^{2}
  \]
@@ -387,15 +343,16 @@ print(xtable::xtable(a,caption="Sampling of brnaching model",label = "table_bran
  \]
 This means that the distribution of $p\_branch$ and $p\_loss$  can be represented with the parameters $a_{branching}$, $b_{branching}$ $a_{branch\_loss}$, and $b_{branch\_loss}$:
 
-<<a_b_branch>>=
-summary_jags<-read.table("number_new_branches_JAGS_output.csv")
+<<a_b_branch, eval=T>>=
+summary_jags<-read.csv("number_new_branches_JAGS_output.csv", header = T, 
+                         row.names = 1)
 mu_branch<-summary_jags[1,4]
 sd_branch<-summary_jags[1,5]
 a_branch <- (((1-mu_branch)/(sd_branch**2)-1/mu_branch))*mu_branch**2
 b_branch <- a_branch*(1/mu_branch-1)
 a_branch
 b_branch
-  
+
 mu_loss<-summary_jags[2,4]
 sd_loss<-summary_jags[2,5]
 a_loss<-(((1-mu_loss)/(sd_loss**2)-1/mu_loss))*mu_loss**2
@@ -404,24 +361,27 @@ a_loss
 b_loss
 @
 
+
 \subsection{Phytomer mortality}
 
 This submodel was used to sample the distribution of the parameters that relate phytomer mortality ($m_{p}$) to age in plastochrones.
 To approximate phytomer mortality, the number the total number of internodes at each $j$ position in the rhizome was counted (where the position $j$=1 corresponds to the phytomer at the tip of the branch).
-Assuming that the position $j$ in the rhizome indicates the age $p$ in plastochrones of the internode, the number of phytomers of age $p$ in the whole database was counted ($p \geq 1$). 
+Assuming that the position $j$ in the rhizome indicates the age $p$ in plastochrones of the internode, the number of phytomers of age $p$ in the whole database was counted ($p \geq 1$).
 Assuming a constant age structure, the proportion of phytomers that do not reach age $p$ is $m_{p}$:
 \[
-m_{p}=1-\frac{n_{p=1}}{n_{p}}
+m_{p}=\frac{1}{1+e^{m_{\alpha}+m_{\beta} p}}
 \]
 
-Then, the mortality was modeled as a linear regression model between the proportion of phytomers that reach age $p$ and plastochrone age (Figure \ref{fig_mort_data}).
+Then, the mortality was modeled as a logistic model between the proportion of phytomers that reach age $p$ and plastochrone age (Figure \ref{fig_mort_data}).
 The submodel was sampled for 1000 iterations, with non-informative priors on the parameters.
 The results of the sampling are shown in Table \ref{table_mort_sample}.
 
+<<label=mort_datos,fig=TRUE,include=F, echo=FALSE,eval=T>>=
 
-<<label=mort_datos,fig=TRUE,include=F,echo=FALSE,eval=T>>=
-
-growth <- read.csv("internodes_and_branches_2000.csv",header=T)
+growth_2018 <- read.csv("internodes_and_branches_2018_environment.csv", header=T)
+growth <- rbind(growth_2018,
+                     read.csv("internodes_and_branches_2000_environment.csv",
+                                        header=T))
 
 age_class<-matrix(nrow = max(growth$number_internodes_in_rhizome),ncol = 4)
 age_class[,1]<-seq(1,max(growth$number_internodes_in_rhizome),1)
@@ -451,91 +411,21 @@ plot(cummulative_mortality,xlab="Age (plastochrone)",ylab="Mortality")
 
 \begin{figure}[ht]
 \centering2\includegraphics{full_report_R-mort_datos}
-\caption{Proportion of the initial total observed phytomers of age  in plastochrones ($p$)} \label{fig_mort_data}
+\caption{Phytomer mortality per plastochrone age ($p$) of the observed plants of 2000 and 2018} \label{fig_mort_data}
 \end{figure}
 
+The following scrip (\textit{phytomer\_mortality\_JAGS\_sampling\_Salinas\_Solana.R}) was used to parametrize the submodel of phytomer mortality using data from 2000 and 2018:
 
-
-<<label=mort_sample,echo=TRUE,eval=F>>=
-# chunk to sample from the model pfytomer mortality
-library(runjags)
-growth <- read.csv("internodes_and_branches_2000.csv",header=T)
-
-# here we see the minimun  observed number of phytomers in a rhizome
-min(growth$number_internodes_in_rhizome)
-
-stages<-matrix(nrow = max(growth$number_internodes_in_rhizome),ncol = 4)
-stages[,1]<-seq(1,max(growth$number_internodes_in_rhizome),1)
-stages[,2]<-rep(0,max(growth$number_internodes_in_rhizome))
-for (n in (growth$number_internodes_in_rhizome)){
-  row_n<-n
-  while (row_n>0){
-    stages[row_n,2]<-stages[row_n,2]+1
-    row_n<-row_n-1
-  }
+<<label=mort_sample,echo=TRUE,eval=T>>=
+if (!file.exists("phytomer_mortality_JAGS_output.csv")){
+  source("phytomer_mortality_JAGS_sampling_Salinas_Solana.R")
 }
-colnames(stages)<-c("p","Number of observations","Not surviving","Surviving")
-
-# calculating proportion of initial phytomer that survive to p
-for (i in 1:nrow(stages)-1){
-  stages[i,3]<-stages[i,2]-stages[i+1,2]#number of dying
-  stages[i,4]<-stages[i,2]-stages[i,3]#number of living
-}
-#to calculate the proportion of phytomer that reach age p
-mortality<-as.data.frame(matrix(c(stages[,1],1-(
-  stages[,4]/stages[1,2])),ncol=2,byrow=F))
-
-colnames(mortality)<-c("p","Mortality")
-
-data_list <- list(
-  age = mortality$p, 
-  mortality = mortality$Mortality,
-  ntotal = dim(mortality)[1] 
-)
-
-#fot the initial values
-regresion<-lm(mortality$Mortality~mortality$p)
-initials <- list(
-  beta0 = regresion$coef[1] ,   
-  beta1 = regresion$coef[-1],
-  sigma = 1)
-
-modelo_mort <-"model {for ( i in 1:ntotal){
-mortality[i]~dnorm(mean[i],1/sigma**2)
-mean[i]<-beta0 + (beta1 * age[i])
-}
-beta0~dunif(-10,10)
-beta1~dunif(-10,10)
-sigma~dunif(0,10)
-}"
-writeLines(modelo_mort, con="model_phytomer_mortality_JAGS.txt" )
-parameters<-c("beta0","beta1","sigma")
-adaptSteps <- 500
-burn_in <- 5000 
-num_iter<-5000
-thinSteps<-10
-num_cadenas<-3
-
-set.seed(26)
-
-runJagsOut <-run.jags(model="model_phytomer_mortality_JAGS.txt",
-                      monitor=parameters,
-                      data=data_list,
-                      n.chains=num_cadenas,
-                      adapt=adaptSteps,
-                      burnin=burn_in,
-                      sample=num_iter,
-                      thin=thinSteps,
-                      inits = initials,
-                      summarise=FALSE,silent.jags = T,
-                      plots=FALSE)
-
-write.csv(x = summary(runJagsOut),"phytomer_mortality_JAGS_output.csv")
+cat(readLines("phytomer_mortality_JAGS_sampling_Salinas_Solana.R"), sep = "\n")
 @
 
-<<echo = F, results = tex>>=
+<<echo = F, results = tex, eval=T>>=
 a<-read.csv("phytomer_mortality_JAGS_output.csv")
-print(xtable::xtable(a,caption="Sampling of phytomer mortality model results",label = "table_mort_sample"),table.placement="p")
+print(xtable::xtable(a,caption="Sampling of phytomer mortality model results",label = "table_mort_sample"),table.placement="h")
 @
 
 
@@ -544,57 +434,17 @@ The internodes of a rhizome are assumed to be longer than those of lateral branc
 This submodel approximates the fraction of the internode length of lateral branches to that of the rhizomes.
 The submodel assumes that each plant has a mean internode length, from which the length of lateral branches internodes is a fraction.
 The internode length was modeled as a variable with a normal distribution.
-Each internode was classified belonging either to a rhizome or a lateral branch; 0 or 1, respectively. 
+Each internode was classified as belonging either to a rhizome or a lateral branch; 0 or 1, respectively.
 In the case of lateral branches, the individual mean internode length was multiplied by the shrink factor.
 The sampling of these parameters was made using a relatively small sample of 65 internodes, as only these measures of lateral branches were available.
 This submodel was sampled for 1000 iterations, with non-informative priors on the parameters.
-
+The following script (\textit{shrink\_factor\_JAGS\_sampling\_Salinas\_Solana.R}) was used to sample the submodel:
 <<shrink_factor,echo=T,eval=F>>=
-# chunk to sample from the model shrink factor
-library(runjags)
-internodes <- read.csv("internode_length_rhizome_and_lateral.csv",header=T)
-
-data_list <- list(
-  individual=internodes$Individual,
-  ninds =length(unique(internodes$Individual)),
-  type = internodes$rhizome_0_else_lateral_1,
-  length = internodes$internode_length,
-  ntotal = dim(internodes)[1]) 
-
-model_shrink <-"model{
-for (i in 1:ntotal){
-length[i]~dnorm(mu[i],1/sigma**2)
-mu[i]<-((1-type[i])*mu_ind[individual[i]])+(type[i]*mu_ind[individual[i]]*shrink)
-} 
-for (j in 1:ninds){
-mu_ind[j]~dunif(0,50)
+if (!file.exists("shrink_factor_JAGS_output.csv")){
+  source("shrink_factor_JAGS_sampling_Salinas_Solana.R")
 }
-shrink~dunif(0,3)
-sigma~dnorm(1,1/4**2)}
-"
-writeLines(model_shrink, con="model_shrink_factor_JAGS.txt" )
+cat(readLines("shrink_factor_JAGS_sampling_Salinas_Solana.R"), sep = "\n")
 
-parameters<-c("shrink")
-adaptSteps <- 500
-num_iterations<-1000
-burn_in <- 1000
-thinSteps<-10
-num_cadenas<-3
-
-set.seed(26)
-
-runJagsOut <- run.jags(model="model_shrink_factor_JAGS.txt",
-                       monitor=parameters,
-                       data=data_list,
-                       n.chains=num_cadenas ,
-                       adapt=adaptSteps,
-                       burnin=burn_in,
-                       sample=num_iterations,silent.jags = T,
-                       thin=thinSteps,
-                       summarise=FALSE,
-                       plots=FALSE )
-
-write.csv(x = summary(runJagsOut),"shrink_factor_JAGS_output.csv")
 @
 
 <<shrinktable, echo = F, results = tex>>=
@@ -603,7 +453,7 @@ xtable::xtable(read.csv("shrink_factor_JAGS_output.csv",header = T),caption="Dis
 
 
 \section{Validation}
-The Python code of the model and test data sets are available at https://github.com/hugosal/Zostera-marina-IBM and https://doi.org/10.5281/zenodo.3763829.
+The Python code of the model and test data sets are available at https://github.com/hugosal/Zostera-marina-IBM.
 
 Meadow development simulations during 2000 and 2018 were made using the environmental conditions and the observed individuals each year as inputs:\\
 
@@ -619,367 +469,78 @@ Meadow development simulations during 2000 and 2018 were made using the environm
   \end{lstlisting}
 \end{minipage}
 
-Ten simulations per year were made with the same inputs but with different pseudo-random seed numbers chosen randomnly.
+Ten simulations per year were made with the same inputs but with different pseudo-random seed numbers chosen randomly.
 
-For the year 2000 the simulation were performed with the number seeds 87, 85, 28, 96, 88, 90, 6, 31, 58 and 42.
-In the case of 2018 the seeds were 25, 34, 5, 39, 4, 56, 18, 32, 3, and 77.
+the year 2000, the simulations were performed with the number seeds 1, 10, 15, 24, 28, 31, 34, 36, 42, 57, 58, 6, 62,  7, 70, 85, 87, 88, 90, and 96.
+In the case of 2018 the seeds were 18, 25,  3, 32, 34, 39,  4, 40, 41, 44, 49,  5, 50, 56, 57, 64, 66, 76, 77, and 93.
 The resulting output files for each of the simulated years need to be in a single directory.
 
-The effect of the \textit{Type} (simulated or observed) and \textit{Time} (date of observation) factors on rhizome length ($l_r$) was assessed with the Bayes factor (BF) of a Bayesian  ANOVA.
-The test was done using the BayesFactor package (0.9.12). The following method was used to apply this test each of the simulation output files (one for each of the random seed numbers).
-
-<<validation,echo=T,eval=T>>=
-# method used for the validation of model: compare
-# rhizome length of observed and simulated plants
-
-# function to calculate the ANOVA and extract the  BF
-# the observed_file_name and simulated_file_name is the path
-# to file with observed rhizomes length with the 'ecol_mat' 
-# format (a csv, with rows: date, rhizomeid, and internode length)
-
-library("BayesFactor")
-
-bayes_anov_zostera<-function(simulated_file_name,observed_file_name){
-  observed <- read.csv(observed_file_name,header=T,
-                       stringsAsFactors = F)
-  observed<-observed[observed$Internode_length>0,]
-  simulated <- read.csv(simulated_file_name,header=T,
-                        stringsAsFactors = F)
-  simulated<-simulated[,c(1,2,4)]
-  rhizome_length <- data.frame(date=character(),
-                               type=character(),
-                               lengths=numeric(),
-                               stringsAsFactors = F)
-  dates <- intersect(unique(as.character(simulated[,1])),
-                     unique(as.character(observed[,1])))# intersect dates
-  dates <- dates[!is.na(dates)]
-  rhizome_number <-intersect(unique(as.character(simulated[,2])),
-                             unique(as.character(observed[,2])))
-  rhizome_number <- rhizome_number[!is.na(rhizome_number)]
-  i<-1
-  for (f in dates){
-    for (r in rhizome_number){
-      rhizome_length[i,1]<-f
-      rhizome_length[i,2]<-"Observed"
-      rhizome_length[i,3]<-sum(observed[which(observed[,1]==f & observed[,2]==r),3],
-                               na.rm = T)
-      i<-i+1
-      rhizome_length[i,1]<-f
-      rhizome_length[i,2]<-"Simulated"
-      rhizome_length[i,3]<-sum(simulated[which(simulated[,1]==f & simulated[,2]==r),3],
-                               na.rm = T)
-      i<-i+1
-    }} # compute the length of each rhizome as the sum of its internodes lengths 
-  
-  rhizome_length<-rhizome_length[!rhizome_length$lengths==0,]
-  rhizome_length<-rhizome_length[rhizome_length$lengths>1,]
-  rhizome_length<-rhizome_length[!(rhizome_length[,3]==0),]
-  
-  rhizome_length$date<-as.factor(rhizome_length$date)
-  rhizome_length$type<-as.factor(rhizome_length$type)
-  
-  an<-BayesFactor::anovaBF(lengths ~ date + type, data=rhizome_length,progress = F)#calculate BF
-  
-  result_vector<-rep(0,4) # initialize vector
-  result_vector[1]<-BayesFactor::extractBF(an[1])[1]
-  result_vector[2]<-BayesFactor::extractBF(an[2])[1]
-  result_vector[3]<-BayesFactor::extractBF(an[3])[1]
-  result_vector[4]<-BayesFactor::extractBF(an[4])[1]
-  return(result_vector)
+The effect of the \textit{Type} (simulated or observed) and \textit{Time} (date of observation) factors on rhizome length and number of phytomers per rhizome was assessed with the Bayes factor (BF) of a Bayesian  ANOVA.
+The test was done using the BayesFactor package (0.9.12). 
+The BF was computed for each of the simulation output files (one for each of the random seed numbers).
+The mean and error of the BF are shown in Tables \ref{table_validation_length} and \ref{table_validation_nphyt}.
+The BF of the test on rhizome length was done with the script (\textit{validation\_ANOVA\_BF\_2000\_and\_2018\_Salinas\_Solana.R}):
+<<validation,echo=F,eval=T>>=
+if (!file.exists("validation_rhiz_length_BF_table.csv")){
+  source("validation_ANOVA_BF_2000_and_2018_Salinas_Solana.R")
 }
-
-set.seed(26)
-
-# for 2000
-observed2000<-"observed_rhizomes_2000.csv"# the observed rhizomes file
-files2000 <- list.files(path="outs2000/",full.names = T) # the directory with many simulated rhizome files
-
-out2000<-lapply(files2000,FUN = bayes_anov_zostera,observed_file_name=observed2000)
-out2000<-data.frame(matrix(unlist(out2000),nrow=length(out2000), byrow=T))
-
-files2000 <- list.files(path="outs2000/",full.names = F) # file names 
-# to make row name equal to random seed number
-get_output_random_seed<-function(name){
-  substr(name,start = 80,stop = 81)}
-
-rownames(out2000)<-unlist(lapply(files2000, FUN = get_output_random_seed))
-
-#column names
-colnames(out2000)<-c("Time","Type", "Time+Type","Time+Type+TimeXType")
-
-
-#for 2018
-observed2018<-"observed_rhizomes_2018.csv"
-files2018 <- list.files(path = "outs2018/",full.names = T)
-out2018<-lapply(files2018,FUN = bayes_anov_zostera,
-                observed_file_name=observed2018)
-out2018<-data.frame(matrix(unlist(out2018),nrow=length(out2018), byrow = T))
-files2018 <- list.files(path = "outs2018/",full.names = F)
-rownames(out2018)<-unlist(lapply(files2018,FUN = get_output_random_seed))
-colnames(out2018)<-c("Time","Type", "Time+Type","Time+Type+TimeXType")
-
-# function to compute standart error
-stand_error<-function(x){sd(x)/sqrt(length(x))}
-
-# join 2000 and 2018 results in a single table, and compute the mean and SE of BF
-validation_tab<-data.frame(mean=c(apply(out2000,MARGIN = 2,FUN = mean),
-                                  apply(out2018,MARGIN = 2,FUN = mean)),
-                           error=c(apply(out2000,MARGIN = 2,FUN = stand_error),
-                                   apply(out2018,MARGIN = 2,FUN = stand_error)))
-# Add a column with a specific row names
-validation_tab<-cbind(data.frame(Factor=c("2000 Time",
-                                          "2000 Type", "2000 Type+Type",
-                                          "2000 Type+Type+TypeXTime",
-                                          "2018 Time","2018 Type","2018 Type+Type",
-                                          "2018 Type+Type+TypeXTime")),validation_tab)
-write.csv(validation_tab,file = "validation_BF_table.csv")
+cat(readLines("validation_ANOVA_BF_2000_and_2018_Salinas_Solana.R"), sep = "\n")
 @
 
-<<table_validation,results = tex,echo=F >>=
-xtable::xtable(read.csv("validation_BF_table.csv",header = T),caption="Bayes factor mean and error",label = "validation_tab")
+The comparison of the number of phytomers per rhizome was done with the script\\ \textit{validation\_n\_phtomers\_ANOVA\_BF\_2000\_and\_2018\_Salinas\_Solana.R}:
+<<validation,echo=F,eval=T>>=
+if (!file.exists("validation_n_phyt_BF_table.csv")){
+  source("validation_n_phtomers_ANOVA_BF_2000_and_2018_Salinas_Solana.R")
+}
+cat(readLines("validation_n_phtomers_ANOVA_BF_2000_and_2018_Salinas_Solana.R"), sep = "\n")
 @
 
-Visually, the data show a similar trend in time (Fig. \ref{fig_obs_esp}).
-
-\begin{figure}[ht]
-\centering2\includegraphics{full_report_R-fig_obs_esp}
-\caption{Time series of the rhizome length of the observed (black squares) and simulated plants (gray triangles) per date (day/month). The upper and lower panels show data from the year 2000 and 2018, respectively.
-The simulated data of 2000 correspond to the results obtained with 31 as the random seed number, and 32 for 2018.
-The points represent mean, the error bars are $\pm$  the standard deviation. A sample of $n\ \approx\ 20$ rhizomes was included per date} \label{fig_obs_esp}
-\end{figure}
-
-<<fig_obs_esp,echo=T,fig=TRUE,include=FALSE,echo=F>>=
-par(mfrow=c(2,1))
-par(mar=c(3,4,2,1))
-
-color_palette<-c("gray0","gray57")
-
-data_simulated_2000 <- read.csv("outs2000/ecol_mat_nod_founding_rhizomes_2000_environment_2000_cannal_200m_broad_4m_prof_31.csv",
-                                header=T,stringsAsFactors = F)
-data_simulated_2000<-data_simulated_2000[,c(1,2,4)] 
-data_observed_2000 <- read.csv("observed_rhizomes_2000.csv",header=T,stringsAsFactors = F)
-data_observed_2000<-data_observed_2000[data_observed_2000$Internode_length>0,]
-
-rhizome_length <- data.frame(date=character(),tipo=character(),
-                             longitud=numeric(),stringsAsFactors = F)
-dates <- intersect(unique(as.character(data_simulated_2000[,1])),
-                   unique(as.character(data_observed_2000[,1])))
-dates <- dates[!is.na(dates)]
-rhizomes_numbers <-intersect(unique(as.character(data_simulated_2000[,2])),
-                             unique(as.character(data_observed_2000[,2])))
-rhizomes_numbers <- rhizomes_numbers[!is.na(rhizomes_numbers)]
-
-i<-1
-for (f in dates){
-  for (r in rhizomes_numbers){
-    rhizome_length[i,1]<-f
-    rhizome_length[i,2]<-"observed"
-    rhizome_length[i,3]<-sum(data_observed_2000[which(data_observed_2000[,1]==f & 
-                                                        data_observed_2000[,2]==r),3],
-                             na.rm = T)
-    i<-i+1
-    rhizome_length[i,1]<-f
-    rhizome_length[i,2]<-"simulated"
-    rhizome_length[i,3]<-sum(data_simulated_2000[which(data_simulated_2000[,1]==f &
-                                                         data_simulated_2000[,2]==r),3],
-                             na.rm = T)
-    i<-i+1
-  }}
-
-rhizome_length<-rhizome_length[!rhizome_length$longitud==0,]
-rhizome_length<-rhizome_length[rhizome_length$longitud>1,]
-rhizome_length<-rhizome_length[!(rhizome_length[,3]==0),]
-rhizome_length$date<-as.factor(rhizome_length$date)
-rhizome_length$tipo<-as.factor(rhizome_length$tipo)
-
-mean_length <- data.frame()
-i<-1
-for (d in dates){
-  mean_length[i,1]<-as.character(d)
-  mean_length[i,2]<-mean(rhizome_length$longitud[
-    which(rhizome_length$date==d &
-            rhizome_length$tipo=="observed")])
-  mean_length[i,3]<-mean(rhizome_length$longitud[
-    which(rhizome_length$date==d &
-            rhizome_length$tipo=="simulated")]) 
-
-  mean_length[i,4]<-sd(rhizome_length$longitud[
-    which(rhizome_length$date==d &
-            rhizome_length$tipo=="observed")]) 
-  mean_length[i,5]<-sd(rhizome_length$longitud[
-    which(rhizome_length$date==d &
-            rhizome_length$tipo=="simulated")])
-  i<-i+1
-}
-colnames(mean_length)<-c("date","observed","simulated","sd_obs","sd_sim")
-tiempos<-length(dates)
-
-plot(1:tiempos,rep(1,tiempos),
-     type='n',xaxt = "n",ylim=c(50,420),
-     ylab="Rhizome length (mm)",xlab="",main="2000")
-grid()
-for (t in 1:tiempos){
-  obs_sup<-mean_length$observed[t]+mean_length$sd_obs[t]
-  obs_inf<-mean_length$observed[t]-mean_length$sd_obs[t]
-  lines(x = rep(t,2)-0.05,y = c(obs_inf,obs_sup),col=color_palette[1],lty=1)
-
-  sim_sup<-mean_length$simulated[t]+mean_length$sd_sim[t]
-  sim_inf<-mean_length$simulated[t]-mean_length$sd_sim[t]
-  lines(x = rep(t,2)+0.05,y = c(sim_inf,sim_sup),col=color_palette[2],lty=1)
-  
-}
-
-lines(1:tiempos-0.05,mean_length$observed,
-      col=color_palette[1],type = "l")
-lines(1:tiempos+0.05,mean_length$simulated,
-      col=color_palette[2],type = "l")
-
-points(1:tiempos-0.05,mean_length$observed,
-       col=color_palette[1],pch=15,type = "b")
-points(1:tiempos+0.05,mean_length$simulated,
-       col=color_palette[2],pch=17,type = "b")
-
-axis(1, at = 1:length(dates), labels =unique(substr(rhizome_length$date, 1, 5)),
-     las = 2,cex.axis=0.6)
-legend(x="top",ncol = 2, legend=c("Observed","Simulated"),
-       col = c(color_palette[1],color_palette[2]),cex=1,pch=c(15,17),lty = 1)
-
-
-data_simulated_2018 <- read.csv("outs2018/ecol_mat_nod_founding_rhizomes_2018_environment_2018_cannal_200m_broad_4m_prof_32.csv",header=T,stringsAsFactors = F)
-data_simulated_2018<-data_simulated_2018[,c(1,2,4)] 
-data_observed_2018 <- read.csv("observed_rhizomes_2018.csv",header=T,stringsAsFactors = F)
-data_observed_2018<-data_observed_2018[data_observed_2018$Internode_length>0,]
-rhizome_length_2018 <- data.frame(date=character(),tipo=character(),longitud=numeric(),
-                                  stringsAsFactors = F)
-dates_2018 <- intersect(unique(as.character(data_simulated_2018[,1])),
-                        unique(as.character(data_observed_2018[,1])))
-dates_2018 <- dates_2018[!is.na(dates_2018)]
-rhizomes_numbers <-intersect(unique(as.character(data_simulated_2018[,2])),
-                             unique(as.character(data_observed_2018[,2])))
-rhizomes_numbers <- rhizomes_numbers[!is.na(rhizomes_numbers)]
-
-i<-1
-for (d in dates_2018){
-  for (r in rhizomes_numbers){
-    rhizome_length_2018[i,1]<-d
-    rhizome_length_2018[i,2]<-"observed"
-    rhizome_length_2018[i,3]<-sum(data_observed_2018[which(data_observed_2018[,1]==d & 
-                                                             data_observed_2018[,2]==r),3],
-                                  na.rm = T)
-    i<-i+1
-    rhizome_length_2018[i,1]<-d
-    rhizome_length_2018[i,2]<-"simulated"
-    rhizome_length_2018[i,3]<-sum(data_simulated_2018[which(data_simulated_2018[,1]==d & 
-                                                              data_simulated_2018[,2]==r),3],
-                                  na.rm = T)
-    i<-i+1
-  }}
-
-
-rhizome_length_2018<-rhizome_length_2018[!rhizome_length_2018$longitud==0,]
-
-rhizome_length_2018<-rhizome_length_2018[rhizome_length_2018$longitud>1,]
-
-rhizome_length_2018<-rhizome_length_2018[!(rhizome_length_2018[,3]==0),]
-
-
-rhizome_length_2018$date<-as.factor(rhizome_length_2018$date)
-rhizome_length_2018$tipo<-as.factor(rhizome_length_2018$tipo)
-
-mean_length <- data.frame()
-i<-1
-for (f in dates_2018){
-  mean_length[i,1]<-as.character(f)
-  mean_length[i,2]<-mean(rhizome_length_2018$longitud[
-    which(rhizome_length_2018$date==f &
-            rhizome_length_2018$tipo=="observed")])  
-  mean_length[i,3]<-mean(rhizome_length_2018$longitud[
-    which(rhizome_length_2018$date==f &
-            rhizome_length_2018$tipo=="simulated")]) 
-
-  mean_length[i,4]<-sd(rhizome_length_2018$longitud[
-    which(rhizome_length_2018$date==f &
-            rhizome_length_2018$tipo=="observed")])
-  mean_length[i,5]<-sd(rhizome_length_2018$longitud[
-    which(rhizome_length_2018$date==f &
-            rhizome_length_2018$tipo=="simulated")])
-  i<-i+1
-}
-colnames(mean_length)<-c("date","observed","simulated","sd_obs","sd_sim")
-times2018<-length(dates_2018)
-
-
-plot(1:times2018,rep(1,times2018),
-     type='n',xaxt = "n",ylim=c(50,900),
-     ylab="Rhizome length (mm)",xlab="",main="2018" )
-grid()
-
-for (t in 1:times2018){
-  obs_sup<-mean_length$observed[t]+mean_length$sd_obs[t]
-  obs_inf<-mean_length$observed[t]-mean_length$sd_obs[t]
-  lines(x = rep(t,2)-0.02,y = c(obs_inf,obs_sup),col=color_palette[1],lty=1)
-
-  sim_sup<-mean_length$simulated[t]+mean_length$sd_sim[t]
-  sim_inf<-mean_length$simulated[t]-mean_length$sd_sim[t]
-  lines(x = rep(t,2)+0.02,y = c(sim_inf,sim_sup),col=color_palette[2],lty=1)
-  
-}
-
-lines(1:times2018-0.02,mean_length$observed,
-      col=color_palette[1],type = "l")
-lines(1:times2018+0.02,mean_length$simulated,
-      col=color_palette[2],type = "l")
-
-points(1:times2018-0.02,mean_length$observed,
-       col=color_palette[1],pch=15,type = "b")
-points(1:times2018+0.02,mean_length$simulated,
-       col=color_palette[2],pch=17,type = "b")
-
-axis(1, at = 1:length(dates), labels=unique(substr(rhizome_length$date, 1, 5)),
-     las = 2,cex.axis=0.6)
-
-legend(x="top",ncol = 2, legend=c("Observed","Simulated"),
-       col = c(color_palette[1],color_palette[2]),cex=1,pch=c(15,17),lty=1)
+<<validation_table, echo = F, results = tex>>=
+print(xtable::xtable(read.csv("validation_rhiz_length_BF_table.csv",header = T),caption="BF of the ANOVA on rhizome length. The mean and standard error of the BF are presented for the 20 simulations per year.",label = "table_validation_length"),
+      latex.environments = "center")
 @
+
+<<validation_table, echo = F, results = tex>>=
+print(xtable::xtable(read.csv("validation_n_phyt_BF_table.csv",header = T),caption="BF of the ANOVA on number of phytomers. The mean and standard error of the BF are presented for the 20 simulations per year",label = "table_validation_nphyt"), latex.environments = "center")
+@
+
+
 
 \section{Sensitivity analysis}
-A local sensitivity analysis on the IBM parameters was performed. 
+A local sensitivity analysis on the IBM parameters was performed.
 Using Latin hypercube sampling (LHS), we established 100 parameter value combinations ranging from $\pm\ 30\%$ of the value of each parameter.
 Simulations were made using each of these combinations as inputs, and those simulations ran for the first ten fortnights of the year 2000 with the same pseudo-random number seed.
-The output measure for this analysis was the mean rhizome length of the meadow at the end of the simulation. 
+The output measure for this analysis was the mean rhizome length of the meadow at the end of the simulation.
 The Pearson correlation coefficient was calculated between the LHS parameter values and the output measure, and the BF of the correlation was calculated using the linearReg.R2stat function of the package BayesFactor (0.9.12), with the 1000 observations, testing for the effect of one predictor (parameter value) at a time.
-The correlation and its BF are shown in Table \ref{tabl_sensit}.
-The simulations results and the parameter values can be generated using the file from the mentioned repository (https://github.com/hugosal/Zostera-marina-IBM and https://doi.org/10.5281/zenodo.3763829).
+The correlation and its BF are shown in Table \ref{tabl:sensit}.
+The simulations results and the parameter values can be generated using the file \textit{sensitivity\_sampling.py}  (from the repository https://github.com/hugosal/Zostera-marina-IBM ):
+
 \begin{minipage}{\linewidth}
 	\begin{lstlisting}[frame=single,caption={},language=bash]
   $ python sensitivity_sampling.py
   \end{lstlisting}
 \end{minipage}
-The correlation was calculated using the following code:
-<<sensitivity,echo=T,eval=T>>=
-# chunk to compute correlations for the sensitivity analysis
-library(BayesFactor)
-# these next two files are obtained from the python code 
-latin<-read.csv("latin_hipercube.csv",header = F)
-out_latin<-read.csv("outputs_for_latin.csv",header = F) 
-covar<-data.frame(cor(out_latin, latin, method ="pearson"))
-sorted_cov<-sort(covar,decreasing = T)# compute pearson corrrelation coefficient and sort
-sorted_cov<-rbind(sorted_cov,rep(0,length(sorted_cov)))
-# compute BF for each correlation
-for (corre in 1:length(sorted_cov)){
-  sorted_cov[2,corre]<-BayesFactor::linearReg.R2stat(N=dim(latin)[1],
-                            p=1, R2=sorted_cov[1,corre]^2,simple = T)}
 
-rownames(sorted_cov)<-c("Pearson correlation","Bayes Factor")
+The correlation was calculated using the script (\textit{sensitivity\_analysis\_Salinas\_Solana.R}):
 
-write.csv(sorted_cov,"sensitivity_table_bayes.csv")
+<<sensitivity,echo=F,eval=T>>=
+if (!file.exists("sensitivity_table_bayes.csv")){
+  source("sensitivity_analysis_Salinas_Solana.R")
+}
+cat(readLines("sensitivity_analysis_Salinas_Solana.R"), sep = "\n")
+
 @
 
-<<table_sensi,echo=F,results=tex>>=
-names<-c("$l_{\\mu_{I}}$","$l_{\\mu_{T}}$",'$n_{\\lambda}$','$l_{\\mu_{T^{2}}}$','$a_{shrink}$',	'$a_{branching}$',	'$b_{shrink}$','$b_{branchloss}$','$l_{\\mu_{H}}$' ,	'$l_{\\sigma_{\\alpha}}$','$l_{\\sigma_{\\beta}}$','$b_{branching}$','$l_{\\mu_{A^{2}}}$', '$a_{branchloss}$','$m_{\\alpha}$','$m_{\\beta}$')
-tabl<-t(read.csv("sensitivity_table_bayes.csv",header = T,row.names = 1))
-rownames(tabl)<-names     
-print(xtable::xtable(tabl,caption="Pearson correlation and BF between the model parameters and the mean rhizome length of the sensitivity analysis",label = "tabl_sensit"),sanitize.rownames.function = function(x){x})
+
+<<table_sensi,echo=F,results=tex, eval=T>>=
+names<-c("$l_{\\mu_{I}}$","$l_{\\mu_{T}}$",'$m_{\\alpha}$','$m_{\\beta}$',
+         '$n_{\\lambda}$', '$l_{\\mu_{T^{2}}}$', '$l_{\\mu_{H}}$' ,
+         '$a_{branching}$', '$a_{shrink}$','$b_{branchloss}$','$b_{shrink}$',
+         '$l_{\\sigma_{\\alpha}}$', '$l_{\\sigma_{\\beta}}$','$b_{branching}$',
+         '$a_{branchloss}$', '$l_{\\mu_{A^{2}}}$')
+tabl<-read.csv("sensitivity_table_bayes.csv",header = T , row.names = 1)
+rownames(tabl)<-names
+print(xtable::xtable(tabl, caption="Pearson correlation and BF between the model parameters and the mean rhizome length of the sensitivity analysis",label = "tabl:sensit"), sanitize.rownames.function = function(x){x}, latex.environments = "center")
 @
 
 \end{document}
