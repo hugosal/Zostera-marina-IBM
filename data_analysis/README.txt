@@ -66,13 +66,13 @@ validation_ANOVA_BF_2000_and_2018_Salinas_Solana.R
 validation_n_phtomers_ANOVA_BF_2000_and_2018_Salinas_Solana.R
 
 ANALYSIS STRUCTURE:
-1) Subodel selection
+1) Submodel selection
 The submodels of length of new internodes and number of new phytomers were selected after a model selection process.
-The scripts model_select_length_phyt.R and model_selection_n_phyt.R can be used to re-create the submodel analysis used in the selection.
-These scripts parametrize eight submodels and of each extract the DIC and the 0.95 credible interval of the distribution of its parameters.
+The scripts model_select_length_phyt.R and model_selection_n_phyt.R can be used to re-create the submodel version analysis used in the selection.
+These scripts parametrize eight submodels and of each extract the DIC and the 0.95 credible interval of its parameters.
 
 2) Model parametrization 
-The parametrization consisted of using the JAGS program thorugh the package. 
+The parametrization consisted of using the JAGS program thorugh the package runjags. 
 The model is decomposed into five submodels: number of new internodes in a fortnight, the length of new internodes, the mortality of internodes, the probability of branching, and the internode length shrink factor. 
 The posterior distribution of the parameters of each submodel was approximated using the R scripts: 
 	number_new_branches_JAGS_sampling_Salinas_Solana.R
@@ -81,12 +81,12 @@ The posterior distribution of the parameters of each submodel was approximated u
 	number_new_leaves_JAGS_sampling_Salinas_Solana.R
 	shrink_factor_JAGS_sampling_Salinas_Solana.R
 Each script creates a CSV output file with a summary of the posterior distribution of the parameters of the submodel.
-The parametrization was performed using data of observed plants during the year 2000 in the study site.
+The parametrization was performed using data of observed plants during the year 2000 or 2018 in the study site.
 The values of these parameters were used for the construction of the individual-based model in Python.
 
 3) Model validation
 The model's validation consisted of comparing several simulations of the model with the observed plants during the years 2000 and 2018. 
-The R script validation_ANOVA_BF_2000_and_2018_Salinas_Solana.R was used for this comparison using the BayesFactor package.
+The R script validation_ANOVA_BF_2000_and_2018_Salinas_Solana.R and validation_n_phtomers_ANOVA_BF_2000_and_2018_Salinas_Solana were used for this comparison using the BayesFactor package.
 The R script uses the output files in the directories outs2000 and outs2018 to compare the simulated with the observed plants (observed_rhizomes_2000 and observed_rhizomes_2018.csv).
 Figure 3 shows one comparison of observed and simulated plants through time and was created with the script Fig3_Salinas_Solana.R
 
@@ -95,7 +95,7 @@ The sensivity analysis consisted of running simulations using different values o
 The Latin Hypercube method was used to generate a set of parameter values (sensitivity_sampling.py, in the model source code)
 The R script sensitivity_analysis_Salinas_Solana.R was used to compute the correlation of the parameter values (latin_hipercube.csv) and the output measure (outputs_for_latin.csv).
 
-The file full_report.Rnw contains all the analysis and creates a PDF and TEX report of the results.
+The file full_report.Rnw generates a complete report of the results.
 
 
 DATA-SPECIFIC INFORMATION FOR: internodes_and_branches_2000.csv
