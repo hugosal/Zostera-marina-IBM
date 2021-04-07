@@ -26,7 +26,7 @@ This dataset contains the R scripts and files to perform the statistical analysi
 The scripts include the methods used for the parametrization of an individual-based model, its validation, and sensitivity analysis of its parameters.
 The model was written in the Python programming language and can be downloaded from https://github.com/hugosal/Zostera-marina-IBM
 The model output files used for the validation and sensitivity analysis are included in this data set and can be recreated using the model.
-The R scripts were implemented in R version 3.6.1, in Windows. 
+The R scripts were implemented in R version 4.0.3, in Windows. 
 The package that are used is the BayesFactor package (version 0.9.12-4.2), and the JAGS program (version 4.3.0) with the runjags package (version 2.0.4.6).
 
 1. File List: 
