@@ -41,13 +41,14 @@
 
 \tableofcontents
 
+\section*{}
 The following scripts and datasets can be obtained from https://github.com/hugosal/Zostera-marina-IBM
 
 \section{Environmental conditions data processing}\label{Environmental conditions data processing}
 The observations of seagrass growth were modeled as a function of environmental conditions. 
 To do this, singular values of the environmental conditions during a fortnight were necessary; this section describes the way these values were obtained from the available data.
 
-The time series of the environmental variables data used in the parametrization is shown in Figure \ref{fig_ambientales}.
+The time series of the environmental variables data used in the parameterization is shown in Figure \ref{fig_ambientales}.
 A summary of these variables is presented in Table \ref{tab:environment_summary}.
 
 <<fig_ambientales,echo=F,fig=T,include=F,eval=T>>=
@@ -55,7 +56,7 @@ source("environmental_time_series_plot_2000_Salinas_Solana.R")
 @
 
 \begin{figure}[p]
-\centering\includegraphics[width=129mm]{fig_environmental_time_Series}
+\centering\includegraphics[width=129mm]{Fig3}
 \caption{Water temperature, Irradiance, and \textit{Z. marina} growth variables Mean length of internodes and Mean number of new phytomers (points are mean and error bars a standard deviation) per date of 1999-2000 and 2018 (Day/Month). 
 		Raw data of water temperature anomaly and irradiance were obtained respectively from the IRI/LDEO Climate Data Library, and National Renewable Energy Laboratory.} \label{fig_ambientales}
 \end{figure}
@@ -69,7 +70,7 @@ The irradiance in the fortnight was the sum of the hourly irradiance each hour d
 
 \subsection{Hours of air exposition (HEX)}
 The sampled plants were located at a depth of approximately $+0.5$ m. 
-	For each of the fortnights we counted the number of hours were the sea level was lower than this depth. 
+	For each of the fortnights we counted the number of hours when the sea level was lower than this depth. 
 
 <<environment_table,echo=F,eval=T,results=tex>>=
 # table of the summary of the environmental variables
@@ -82,7 +83,7 @@ print(xtable::xtable(summary(read.csv("environment_data.csv", header = T,
 The length of new internodes and number of new phytomers are related to environmental conditions.
 To test if the observations of these variables can be predicted using the environmental conditions  we used a model selection process.
 We selected the best version of each submodel from a non-exhaustive  set of possible submodels that include some of the variables described in section \ref{Environmental conditions data processing}.
-The model selection consisted of starting with a model that included only a constant value (intercept), this model was parameterized and then compared to a model that included one more variable.
+The model selection consisted of starting with a model that included only a constant value parameter (intercept), this model was parameterized and then compared to a model that included another variable.
 If the second model was better than the first, the new submodel was selected as the best version and the process was repeated with a new possible submodel version.
 To select the best of the two submodels we used a hypothesis test on the value of the parameters in the submodel and the penalized deviance criterion (DIC).
 
@@ -201,7 +202,7 @@ Version & DIC & Variable & 95 CI lower & 95 CI upper \\ \hline
 
 
 
-\section{Submodels and Parametrization}
+\section{Submodels and parameterization}
 The Data files used in the following sections are available at (dx.doi.org/10.17632/zgx8bshzy2.1).
 The posterior distribution of the parameters of the submodels was approximated using  Gibbs sampling.
 Sampling was made using the JAGS program (4.3.0) and the runjags package (2.0.4) in R (4.0.3).
@@ -225,7 +226,7 @@ Due to the low deviation of the parameter $n_{\lambda}$, its value was considere
 
 <<data_new_leaves,echo=F,eval=T,fig=T,include=F,height=4,width=4>>=
 # histogram of the number of new leaves
-growth <- read.csv("internodes_and_branches_2018_environment.csv",header=T)
+growth <- read.csv("internodes_and_branches_2018_environment.csv", header=T)
 new_leaves<-growth$new_leaves_number
 hist(new_leaves,main="",col="gray",breaks=seq(0,6,l=7),xlab="New leaves per rhizome in a fortnight",cex=0.3)
 @
@@ -416,7 +417,7 @@ plot(cummulative_mortality,xlab="Age (plastochrone)",ylab="Mortality")
 
 The following scrip (\textit{phytomer\_mortality\_JAGS\_sampling\_Salinas\_Solana.R}) was used to parametrize the submodel of phytomer mortality using data from 2000 and 2018:
 
-<<label=mort_sample,echo=TRUE,eval=T>>=
+<<label=mort_sample,echo=F,eval=T>>=
 if (!file.exists("phytomer_mortality_JAGS_output.csv")){
   source("phytomer_mortality_JAGS_sampling_Salinas_Solana.R")
 }
@@ -439,7 +440,7 @@ In the case of lateral branches, the individual mean internode length was multip
 The sampling of these parameters was made using a relatively small sample of 65 internodes, as only these measures of lateral branches were available.
 This submodel was sampled for 1000 iterations, with non-informative priors on the parameters.
 The following script (\textit{shrink\_factor\_JAGS\_sampling\_Salinas\_Solana.R}) was used to sample the submodel:
-<<shrink_factor,echo=T,eval=F>>=
+<<shrink_factor,echo = F,eval = T>>=
 if (!file.exists("shrink_factor_JAGS_output.csv")){
   source("shrink_factor_JAGS_sampling_Salinas_Solana.R")
 }
@@ -480,7 +481,7 @@ The test was done using the BayesFactor package (0.9.12).
 The BF was computed for each of the simulation output files (one for each of the random seed numbers).
 The mean and error of the BF are shown in Tables \ref{table_validation_length} and \ref{table_validation_nphyt}.
 The BF of the test on rhizome length was done with the script (\textit{validation\_ANOVA\_BF\_2000\_and\_2018\_Salinas\_Solana.R}):
-<<validation,echo=F,eval=T>>=
+<<validation, echo = F, eval = T>>=
 if (!file.exists("validation_rhiz_length_BF_table.csv")){
   source("validation_ANOVA_BF_2000_and_2018_Salinas_Solana.R")
 }
@@ -488,7 +489,7 @@ cat(readLines("validation_ANOVA_BF_2000_and_2018_Salinas_Solana.R"), sep = "\n")
 @
 
 The comparison of the number of phytomers per rhizome was done with the script\\ \textit{validation\_n\_phtomers\_ANOVA\_BF\_2000\_and\_2018\_Salinas\_Solana.R}:
-<<validation,echo=F,eval=T>>=
+<<validation, echo = F, eval = T>>=
 if (!file.exists("validation_n_phyt_BF_table.csv")){
   source("validation_n_phtomers_ANOVA_BF_2000_and_2018_Salinas_Solana.R")
 }
@@ -523,7 +524,7 @@ The simulations results and the parameter values can be generated using the file
 
 The correlation was calculated using the script (\textit{sensitivity\_analysis\_Salinas\_Solana.R}):
 
-<<sensitivity,echo=F,eval=T>>=
+<<sensitivity, echo = F, eval = T>>=
 if (!file.exists("sensitivity_table_bayes.csv")){
   source("sensitivity_analysis_Salinas_Solana.R")
 }

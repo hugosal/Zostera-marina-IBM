@@ -191,7 +191,7 @@ points(1:times2018-0.02, mean_length$observed,
 points(1:times2018+0.02, mean_length$simulated, 
   col=color_palette[2], pch=17, type = "b")
 
-axis(1, at = 1:length(dates), labels=unique(substr(rhizome_length$date, 1, 5)), 
+axis(1, at = 1:length(dates_2018), labels=unique(substr(rhizome_length_2018$date, 1, 5)), 
   las = 2, cex.axis=0.6)
 
 legend(x="top", ncol = 2, legend=c("Observed", "Simulated"), 

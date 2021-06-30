@@ -1,9 +1,5 @@
 # model selection for number of new phytomers submodel
 
-if(!require("runjags")){
-  install.packages("runjags")
-  library(runjags)}
-
 if(!require("rjags")){
   install.packages("rjags")
   library(runjags)}

@@ -4,7 +4,7 @@ if(postscript_file){grDevices::postscript("Fig3.eps",
      height =5.51, width = 5.51, horizontal = F, onefile = FALSE, 
      paper = "special")
   }else{
-      png("fig_environmental_time_Series.png", 
+      png("Fig3.png", 
       width = 13, height = 13, units = 'cm', res = 600)
      }
 
@@ -29,10 +29,8 @@ growth <- growth[growth$length_of_internode < 50, ] # remove three outliers
 
 dates <- unique(growth$date_stamp)
 
-timest <- format(as.Date(as.character(as.POSIXct((dates - 719529)*86400, 
-      origin = "1970-01-01")), 
-   format = "%Y-%m-%d"), "%d/%m")
-  
+timest <- format(as.Date(unique(growth$date), format = "%d/%m/%Y"), "%d/%m")
+
 mean_lenght_new_inte <- c()
 sd_lenght_new_inte <- c()
 mean_number_new_phy <- c()

@@ -1,7 +1,4 @@
 # model selection for length of new internodes submodel
-if(!require("runjags")){
-  install.packages("runjags")
-  library(runjags)}
 
 if(!require("rjags")){
   install.packages("rjags")
